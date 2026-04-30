@@ -1,0 +1,117 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: r1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: s1
+  labels:
+    topology.inventory.miloapis.com/region: r1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: s2
+  labels:
+    topology.inventory.miloapis.com/region: r1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: c1
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: c2
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s2
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s1-01
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s1
+status:
+  phase: Unassigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s1-02
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s1
+status:
+  phase: Unassigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s2-01
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s2
+    topology.inventory.miloapis.com/cluster: c2
+status:
+  phase: Assigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s2-02
+  labels:
+    topology.inventory.miloapis.com/region: r1
+    topology.inventory.miloapis.com/site: s2
+    topology.inventory.miloapis.com/cluster: c2
+status:
+  phase: Assigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

@@ -1,0 +1,11 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Link
+metadata:
+  name: lv-link-self
+spec:
+  endpoints:
+    - kind: Site
+      name: lv-site-sin1
+    - kind: Site
+      name: lv-site-sin1
+  type: Logical

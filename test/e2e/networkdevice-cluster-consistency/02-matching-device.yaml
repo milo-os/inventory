@@ -1,0 +1,11 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: NetworkDevice
+metadata:
+  name: ndc-device-ok
+spec:
+  clusterRef:
+    name: ndc-cluster-a
+  siteRef:
+    name: ndc-site-a
+  role: Leaf
+  managementAddress: 10.100.1.10

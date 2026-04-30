@@ -1,0 +1,14 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: na-node-01
+  labels:
+    topology.inventory.miloapis.com/region: na-region-uswest
+    topology.inventory.miloapis.com/site: na-site-sfo1
+    topology.inventory.miloapis.com/site-type: Datacenter
+status:
+  phase: Unassigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

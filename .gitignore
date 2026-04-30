@@ -1,0 +1,15 @@
+bin/
+vendor/
+*.test
+*.out
+dist/
+.test-infra/
+kubeconfig
+cover.out
+.idea/
+.vscode/
+*.swp
+.DS_Store
+.claude/
+.task/remote/
+kind

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-controller-manager
+  labels:
+    control-plane: inventory
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  selector:
+    matchLabels:
+      control-plane: inventory
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+      labels:
+        control-plane: inventory
+        app.kubernetes.io/name: inventory
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    control-plane: inventory
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              control-plane: inventory
+      containers:
+      - command:
+        - /inventory
+        args:
+          - --leader-elect
+          - --leader-elect-namespace=inventory-system
+          - --metrics-bind-address=:8080
+          - --health-probe-bind-address=:8081
+        image: ghcr.io/datum-cloud/inventory:dev
+        name: manager
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - "ALL"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        volumeMounts:
+        - name: webhook-cert
+          mountPath: /tmp/k8s-webhook-server/serving-certs
+          readOnly: true
+      serviceAccountName: inventory-controller-manager
+      terminationGracePeriodSeconds: 10
+      volumes:
+      # Optional so the manager can run without admission webhooks: when
+      # the webhook server is disabled the missing Secret is fine.
+      - name: webhook-cert
+        secret:
+          secretName: inventory-webhook-cert
+          defaultMode: 420
+          optional: true

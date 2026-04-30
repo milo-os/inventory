@@ -1,0 +1,94 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: node-assignment
+spec:
+  description: |
+    Exercises Node assignment:
+    - An unassigned Node reaches phase=Unassigned, Ready=True, and has the
+      region/site/site-type topology labels (but no cluster label).
+    - Adding spec.assignment updates the phase to Assigned and adds the
+      cluster label.
+    - Removing spec.assignment returns the Node to Unassigned and clears the
+      cluster label.
+
+  steps:
+    - name: setup-topology
+      description: Create Region + Site + Cluster. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: create-unassigned-node
+      description: |
+        Create a Node without spec.assignment. It should reach
+        phase=Unassigned with the site-scoped topology labels and no
+        cluster label.
+      try:
+        - create:
+            file: 02-unassigned-node.yaml
+        - assert:
+            file: assertions/assert-unassigned.yaml
+        # Cluster topology label must be absent.
+        - script:
+            content: |
+              set -eu
+              label=$(kubectl get node.inventory.miloapis.com na-node-01 \
+                -o jsonpath='{.metadata.labels.topology\.inventory\.miloapis\.com/cluster}')
+              echo "cluster-label=[${label}]"
+              test -z "${label}"
+
+    - name: assign-node
+      description: |
+        Patch the same Node to add spec.assignment pointing at the Cluster.
+        Phase transitions to Assigned and the cluster topology label is added.
+      try:
+        - apply:
+            file: 03-assigned-node.yaml
+        - assert:
+            file: assertions/assert-assigned.yaml
+
+    - name: unassign-node
+      description: |
+        Remove spec.assignment with a JSON-merge-patch setting the field to
+        null. Phase returns to Unassigned and the cluster topology label is
+        cleared. Chainsaw's `script:` step handles the patch directly to keep
+        the step shape simple and schema-stable across chainsaw versions.
+      try:
+        - script:
+            content: |
+              set -eu
+              kubectl patch node.inventory.miloapis.com na-node-01 \
+                --type=merge \
+                -p '{"spec":{"assignment":null}}'
+        - assert:
+            file: assertions/assert-unassigned.yaml
+        # Cluster topology label must be cleared.
+        - script:
+            content: |
+              set -eu
+              label=$(kubectl get node.inventory.miloapis.com na-node-01 \
+                -o jsonpath='{.metadata.labels.topology\.inventory\.miloapis\.com/cluster}')
+              echo "cluster-label=[${label}]"
+              test -z "${label}"
+
+    - name: cleanup-children
+      description: |
+        Chainsaw's automatic cleanup deletes the objects it created in the
+        order they were created, which would try to delete the Site (and
+        Region) before the Node. Explicitly remove the Node and Cluster
+        first so the Site/Region deletes at cleanup time are not blocked by
+        the webhook.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: na-node-01
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Cluster
+              name: na-cluster-prod

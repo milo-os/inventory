@@ -1,0 +1,11 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Link
+metadata:
+  name: lv-link-sin-nrt
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+    - type: EndpointsResolved
+      status: "True"

@@ -1,0 +1,13 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: rsl-site-iad1
+  labels:
+    topology.inventory.miloapis.com/region: rsl-region-useast
+    topology.inventory.miloapis.com/site: rsl-site-iad1
+    topology.inventory.miloapis.com/site-type: Datacenter
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

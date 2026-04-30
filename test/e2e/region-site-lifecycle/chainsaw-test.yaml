@@ -1,0 +1,70 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: region-site-lifecycle
+spec:
+  description: |
+    Exercises the Region + Site lifecycle:
+    - Region and Site transition to Ready and the Site carries topology labels.
+    - The Site CRD enum rejects an unknown .spec.type.
+    - The Region delete webhook rejects deletion while a Site still references it.
+    - Deleting the Site first allows the Region to be deleted.
+
+  steps:
+    - name: create-region
+      description: Create a Region. Should become Ready.
+      try:
+        - create:
+            file: 01-region.yaml
+        - assert:
+            file: assertions/assert-region-ready.yaml
+
+    - name: create-site
+      description: Create a Site in the Region. Should become Ready with topology labels.
+      try:
+        - create:
+            file: 02-site.yaml
+        - assert:
+            file: assertions/assert-site-ready.yaml
+
+    - name: reject-invalid-site-type
+      description: The CRD enum on Site.spec.type should reject "Warehouse".
+      try:
+        - create:
+            file: test-data/invalid-site-type.yaml
+            expect:
+              - check:
+                  ($error != null): true
+
+    - name: reject-delete-region
+      description: |
+        Deleting the Region while a Site still references it must be rejected
+        by the validating webhook, and the Region must still exist afterward.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Region
+              name: rsl-region-useast
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'cannot delete')): true
+        - assert:
+            file: assertions/assert-region-still-exists.yaml
+
+    - name: delete-site-then-region
+      description: |
+        Deleting the Site first must succeed, after which the Region can also
+        be deleted (the webhook no longer blocks).
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Site
+              name: rsl-site-iad1
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Region
+              name: rsl-region-useast

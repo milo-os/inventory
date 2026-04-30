@@ -1,0 +1,144 @@
+# Fleet sampler: a small but coherent mini-topology wiring one sample of
+# each kind together. Apply with:
+#
+#   kubectl apply -f config/samples/inventory_v1alpha1_fleet.yaml
+#
+# Topology: 1 Region → 1 Site → 1 Cluster → 2 Nodes → 1 NetworkDevice, plus
+# a Physical Link between the Site and the Cluster.
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-us-east
+spec:
+  displayName: US East
+  coordinates:
+    latitude: 37.5
+    longitude: -77.5
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-us-east-1a
+spec:
+  displayName: US East 1A
+  regionRef:
+    name: fleet-us-east
+  type: Datacenter
+  address: 21715 Filigree Ct, Ashburn, VA 20147
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-compute-01
+spec:
+  displayName: us-east-1a-compute-01
+  controlPlaneSiteRef:
+    name: fleet-us-east-1a
+  role: Compute
+  provider: sidero-omni
+  endpoint: https://fleet-compute-01.inventory.example.com:6443
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-node-001
+spec:
+  siteRef:
+    name: fleet-us-east-1a
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: amd64
+    memoryBytes: 34359738368
+    disks:
+      - name: nvme0n1
+        sizeBytes: 1099511627776
+        type: NVMe
+  addresses:
+    - type: Internal
+      address: 10.0.1.11
+    - type: Hostname
+      address: fleet-node-001.us-east-1a.inventory.example.com
+  assignment:
+    clusterRef:
+      name: fleet-compute-01
+    role: ControlPlane
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-node-002
+spec:
+  siteRef:
+    name: fleet-us-east-1a
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: amd64
+    memoryBytes: 34359738368
+    disks:
+      - name: nvme0n1
+        sizeBytes: 1099511627776
+        type: NVMe
+  addresses:
+    - type: Internal
+      address: 10.0.1.12
+    - type: Hostname
+      address: fleet-node-002.us-east-1a.inventory.example.com
+  assignment:
+    clusterRef:
+      name: fleet-compute-01
+    role: Worker
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: NetworkDevice
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-leaf-01
+spec:
+  clusterRef:
+    name: fleet-compute-01
+  siteRef:
+    name: fleet-us-east-1a
+  role: Leaf
+  managementAddress: 10.0.0.2
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Link
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: fleet-sample
+  name: fleet-site-to-cluster
+spec:
+  endpoints:
+    - kind: Site
+      name: fleet-us-east-1a
+    - kind: Cluster
+      name: fleet-compute-01
+  type: Physical
+  capacityMbps: 40000
+  latencyMs: "1"

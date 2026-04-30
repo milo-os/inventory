@@ -1,0 +1,9 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: rsl-site-bogus
+spec:
+  displayName: Bogus
+  regionRef:
+    name: rsl-region-useast
+  type: Warehouse

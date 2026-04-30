@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+  name: inventory-leader-election
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: inventory-leader-election
+subjects:
+- kind: ServiceAccount
+  name: inventory-controller-manager

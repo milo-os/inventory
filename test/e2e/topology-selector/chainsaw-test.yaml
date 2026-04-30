@@ -1,0 +1,121 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: topology-selector
+spec:
+  description: |
+    Builds a small fleet (1 Region, 2 Sites, 2 Clusters, 4 Nodes) and then
+    verifies the well-known topology labels are set correctly by executing
+    kubectl label selectors and counting the results.
+
+    Fleet shape:
+      - Region r1
+      - Site s1 (Datacenter)  -> Cluster c1, 2 unassigned Nodes (ts-node-s1-*)
+      - Site s2 (Edge)        -> Cluster c2, 2 Nodes assigned to c2
+
+    Expectations:
+      - region=r1 selects all 4 nodes
+      - site=s2 selects the 2 assigned nodes
+      - cluster=c2 selects the 2 assigned nodes
+      - clusters with region=r1 -> 2
+
+  steps:
+    - name: build-fleet
+      description: Apply the fleet and wait for everything to become Ready.
+      try:
+        - create:
+            file: 01-fleet.yaml
+        - assert:
+            file: assertions/assert-fleet-ready.yaml
+
+    - name: assert-region-selector
+      description: |
+        All 4 Nodes should carry topology.inventory.miloapis.com/region=r1.
+        Count rows via kubectl + wc.
+      try:
+        - script:
+            content: |
+              set -eu
+              count=$(kubectl get nodes.inventory.miloapis.com \
+                -l topology.inventory.miloapis.com/region=r1 \
+                -o name | wc -l | tr -d ' ')
+              echo "count=${count}"
+              test "${count}" = "4"
+
+    - name: assert-site-selector
+      description: |
+        The 2 Nodes at s2 (assigned to c2) should match site=s2.
+      try:
+        - script:
+            content: |
+              set -eu
+              count=$(kubectl get nodes.inventory.miloapis.com \
+                -l topology.inventory.miloapis.com/site=s2 \
+                -o name | wc -l | tr -d ' ')
+              echo "count=${count}"
+              test "${count}" = "2"
+
+    - name: assert-cluster-selector
+      description: |
+        The 2 assigned Nodes (ts-node-s2-01/02) should match cluster=c2.
+      try:
+        - script:
+            content: |
+              set -eu
+              count=$(kubectl get nodes.inventory.miloapis.com \
+                -l topology.inventory.miloapis.com/cluster=c2 \
+                -o name | wc -l | tr -d ' ')
+              echo "count=${count}"
+              test "${count}" = "2"
+
+    - name: assert-cluster-query
+      description: |
+        Both Clusters should be labeled with region=r1, so a cluster query
+        using the region selector returns 2.
+      try:
+        - script:
+            content: |
+              set -eu
+              count=$(kubectl get clusters.inventory.miloapis.com \
+                -l topology.inventory.miloapis.com/region=r1 \
+                -o name | wc -l | tr -d ' ')
+              echo "count=${count}"
+              test "${count}" = "2"
+
+    - name: cleanup-children
+      description: |
+        Delete Nodes and Clusters before chainsaw's automatic cleanup reaches
+        the Sites — the Site delete webhook would otherwise reject deletion
+        while children reference the Site. Links don't exist in this test
+        so no further cleanup is needed.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: ts-node-s1-01
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: ts-node-s1-02
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: ts-node-s2-01
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: ts-node-s2-02
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Cluster
+              name: c1
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Cluster
+              name: c2
