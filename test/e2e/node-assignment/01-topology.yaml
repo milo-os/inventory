@@ -1,0 +1,31 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: na-region-uswest
+spec:
+  displayName: US West
+  coordinates:
+    latitude: 37.7749
+    longitude: -122.4194
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: na-site-sfo1
+spec:
+  displayName: SFO1
+  regionRef:
+    name: na-region-uswest
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: na-cluster-prod
+spec:
+  displayName: prod
+  controlPlaneSiteRef:
+    name: na-site-sfo1
+  role: Compute
+  provider: sidero-omni
+  endpoint: https://k8s.prod.example.com:6443

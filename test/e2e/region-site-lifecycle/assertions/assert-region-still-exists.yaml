@@ -1,0 +1,6 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: rsl-region-useast
+spec:
+  displayName: US East

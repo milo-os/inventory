@@ -1,0 +1,10 @@
+## Append samples of your project ##
+resources:
+- inventory_v1alpha1_region.yaml
+- inventory_v1alpha1_site.yaml
+- inventory_v1alpha1_cluster.yaml
+- inventory_v1alpha1_node.yaml
+- inventory_v1alpha1_networkdevice.yaml
+- inventory_v1alpha1_link.yaml
+- inventory_v1alpha1_fleet.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

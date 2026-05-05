@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Dev overlay used by `task dev:deploy`. Stands up the inventory operator
+# and webhooks in a test-infra kind cluster with cert-manager providing
+# serving certs. Intentionally excludes the milo-integration component so
+# this overlay is self-contained — no external dependency on a Milo
+# control plane, trust-manager, or discovery kubeconfig.
+namespace: inventory-system
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/controller_rbac
+  - ../../components/leader_election
+
+images:
+  - name: ghcr.io/datum-cloud/inventory
+    newName: ghcr.io/datum-cloud/inventory
+    newTag: dev
+
+patches:
+  # Force IfNotPresent so `kind load docker-image` with a locally-built
+  # image is honoured instead of a registry pull.
+  - target:
+      kind: Deployment
+      name: inventory-controller-manager
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: inventory-controller-manager
+      spec:
+        template:
+          spec:
+            containers:
+              - name: manager
+                imagePullPolicy: IfNotPresent

@@ -1,0 +1,119 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: r1
+spec:
+  displayName: Region 1
+  coordinates:
+    latitude: 40.7128
+    longitude: -74.0060
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: s1
+spec:
+  displayName: Site 1
+  regionRef:
+    name: r1
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: s2
+spec:
+  displayName: Site 2
+  regionRef:
+    name: r1
+  type: Edge
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: c1
+spec:
+  displayName: Cluster 1
+  controlPlaneSiteRef:
+    name: s1
+  role: Compute
+  provider: sidero-omni
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: c2
+spec:
+  displayName: Cluster 2
+  controlPlaneSiteRef:
+    name: s2
+  role: Edge
+  provider: sidero-omni
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s1-01
+spec:
+  siteRef:
+    name: s1
+  hardware:
+    cpuCores: 16
+    cpuArchitecture: amd64
+    memoryBytes: 68719476736
+  addresses:
+    - type: Internal
+      address: 10.10.1.11
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s1-02
+spec:
+  siteRef:
+    name: s1
+  hardware:
+    cpuCores: 16
+    cpuArchitecture: amd64
+    memoryBytes: 68719476736
+  addresses:
+    - type: Internal
+      address: 10.10.1.12
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s2-01
+spec:
+  siteRef:
+    name: s2
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: arm64
+    memoryBytes: 34359738368
+  addresses:
+    - type: Internal
+      address: 10.20.1.11
+  assignment:
+    clusterRef:
+      name: c2
+    role: Worker
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: ts-node-s2-02
+spec:
+  siteRef:
+    name: s2
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: arm64
+    memoryBytes: 34359738368
+  addresses:
+    - type: Internal
+      address: 10.20.1.12
+  assignment:
+    clusterRef:
+      name: c2
+    role: Worker

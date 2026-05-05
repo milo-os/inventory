@@ -1,0 +1,81 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: link-validation
+spec:
+  description: |
+    Exercises Link validation:
+    - A well-formed Site-to-Site Link becomes Ready and publishes the
+      EndpointsResolved condition.
+    - CEL rejects a Link whose two endpoints are identical (distinct rule).
+    - CEL rejects a Link whose endpoint kind is outside the allowed enum.
+    - The validating webhook rejects a Link pointing at a missing endpoint.
+
+  steps:
+    - name: setup
+      description: Create Region and two Sites. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: accept-valid-link
+      description: |
+        A Physical Link between two different Sites is accepted, becomes
+        Ready, and reports EndpointsResolved=True.
+      try:
+        - create:
+            file: 02-valid-link.yaml
+        - assert:
+            file: assertions/assert-link-ready.yaml
+
+    - name: reject-self-link
+      description: |
+        A Link whose two endpoints are identical violates the CEL rule
+        "link endpoints must be distinct" and must be rejected.
+      try:
+        - create:
+            file: test-data/self-link.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'distinct')): true
+
+    - name: reject-bad-endpoint-kind
+      description: |
+        A Link whose endpoint Kind is "Region" is outside the allowed enum
+        {Site, Cluster, NetworkDevice} and must be rejected. Either the CEL
+        enum or the webhook may surface the error; we only check that some
+        error is returned.
+      try:
+        - create:
+            file: test-data/bad-endpoint-kind.yaml
+            expect:
+              - check:
+                  ($error != null): true
+
+    - name: reject-missing-endpoint
+      description: |
+        A Link whose endpoint points at a Site that does not exist must be
+        rejected by the validating webhook with a "not found" message.
+      try:
+        - create:
+            file: test-data/missing-endpoint.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: cleanup-children
+      description: |
+        Delete the Link explicitly so cleanup of the Sites (and Region) at
+        end-of-test is not blocked by lingering references. The Sites have
+        no Node/Cluster/NetworkDevice children, so deleting the Link is
+        sufficient.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Link
+              name: lv-link-sin-nrt

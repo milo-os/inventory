@@ -1,0 +1,41 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: inventory
+rules:
+- apiGroups:
+  - inventory.miloapis.com
+  resources:
+  - clusters
+  - links
+  - networkdevices
+  - nodes
+  - sites
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - inventory.miloapis.com
+  resources:
+  - clusters/status
+  - links/status
+  - networkdevices/status
+  - nodes/status
+  - regions/status
+  - sites/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - inventory.miloapis.com
+  resources:
+  - regions
+  verbs:
+  - get
+  - list
+  - watch

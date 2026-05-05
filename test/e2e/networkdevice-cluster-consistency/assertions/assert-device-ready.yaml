@@ -1,0 +1,14 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: NetworkDevice
+metadata:
+  name: ndc-device-ok
+  labels:
+    topology.inventory.miloapis.com/region: ndc-region-eu
+    topology.inventory.miloapis.com/site: ndc-site-a
+    topology.inventory.miloapis.com/site-type: Datacenter
+    topology.inventory.miloapis.com/cluster: ndc-cluster-a
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

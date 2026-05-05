@@ -1,0 +1,152 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+package controller_test
+
+import (
+	"fmt"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apirand "k8s.io/apimachinery/pkg/util/rand"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	inventoryv1alpha1 "go.miloapis.com/inventory/api/v1alpha1"
+
+	. "github.com/onsi/gomega"
+)
+
+const (
+	// defaultTimeout is the default timeout for Eventually assertions.
+	defaultTimeout = 10 * time.Second
+
+	// defaultInterval is the default polling interval for Eventually.
+	defaultInterval = 250 * time.Millisecond
+)
+
+// uniqueName returns a random lowercase suffix unique within the suite run,
+// prefixed by kind. All inventory objects are cluster-scoped, so tests must
+// generate unique names to avoid collisions across specs.
+func uniqueName(kind string) string {
+	return fmt.Sprintf("%s-%s", kind, apirand.String(8))
+}
+
+// deleteRegion deletes a Region ignoring NotFound.
+func deleteRegion(name string) {
+	r := &inventoryv1alpha1.Region{}
+	r.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, r))).To(Succeed())
+}
+
+// deleteSite deletes a Site ignoring NotFound.
+func deleteSite(name string) {
+	s := &inventoryv1alpha1.Site{}
+	s.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, s))).To(Succeed())
+}
+
+// deleteCluster deletes a Cluster ignoring NotFound.
+func deleteCluster(name string) {
+	c := &inventoryv1alpha1.Cluster{}
+	c.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, c))).To(Succeed())
+}
+
+// deleteNode deletes a Node ignoring NotFound.
+func deleteNode(name string) {
+	n := &inventoryv1alpha1.Node{}
+	n.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, n))).To(Succeed())
+}
+
+// deleteNetworkDevice deletes a NetworkDevice ignoring NotFound.
+func deleteNetworkDevice(name string) {
+	d := &inventoryv1alpha1.NetworkDevice{}
+	d.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, d))).To(Succeed())
+}
+
+// deleteLink deletes a Link ignoring NotFound.
+func deleteLink(name string) {
+	l := &inventoryv1alpha1.Link{}
+	l.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, l))).To(Succeed())
+}
+
+// makeRegion returns a Region with the given name that is ready to Create.
+func makeRegion(name string) *inventoryv1alpha1.Region {
+	return &inventoryv1alpha1.Region{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.RegionSpec{
+			DisplayName: "Test Region " + name,
+		},
+	}
+}
+
+// makeSite returns a Site referencing the given region.
+func makeSite(name, regionName string, siteType inventoryv1alpha1.SiteType) *inventoryv1alpha1.Site {
+	return &inventoryv1alpha1.Site{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.SiteSpec{
+			DisplayName: "Test Site " + name,
+			RegionRef:   inventoryv1alpha1.LocalObjectReference{Name: regionName},
+			Type:        siteType,
+		},
+	}
+}
+
+// makeCluster returns a Cluster whose control plane lives at the given site.
+func makeCluster(name, siteName string, role inventoryv1alpha1.ClusterRole) *inventoryv1alpha1.Cluster {
+	return &inventoryv1alpha1.Cluster{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.ClusterSpec{
+			DisplayName:         "Test Cluster " + name,
+			ControlPlaneSiteRef: inventoryv1alpha1.LocalObjectReference{Name: siteName},
+			Role:                role,
+			Provider:            "test-provider",
+		},
+	}
+}
+
+// makeNode returns a Node with a minimal hardware spec referencing the given
+// site. Assignment is left unset.
+func makeNode(name, siteName string) *inventoryv1alpha1.Node {
+	return &inventoryv1alpha1.Node{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.NodeSpec{
+			SiteRef: inventoryv1alpha1.LocalObjectReference{Name: siteName},
+			Hardware: inventoryv1alpha1.NodeHardware{
+				CPUCores:        8,
+				CPUArchitecture: inventoryv1alpha1.CPUArchitectureAMD64,
+				MemoryBytes:     32 * 1024 * 1024 * 1024,
+			},
+		},
+	}
+}
+
+// makeNetworkDevice returns a NetworkDevice referencing the given site and
+// cluster.
+func makeNetworkDevice(name, siteName, clusterName string) *inventoryv1alpha1.NetworkDevice {
+	return &inventoryv1alpha1.NetworkDevice{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.NetworkDeviceSpec{
+			ClusterRef: inventoryv1alpha1.LocalObjectReference{Name: clusterName},
+			SiteRef:    inventoryv1alpha1.LocalObjectReference{Name: siteName},
+			Role:       inventoryv1alpha1.NetworkDeviceRoleLeaf,
+		},
+	}
+}
+
+// makeLink returns a Link whose endpoints both reference Sites with the given
+// names.
+func makeSiteToSiteLink(name, siteA, siteB string) *inventoryv1alpha1.Link {
+	return &inventoryv1alpha1.Link{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.LinkSpec{
+			Endpoints: []inventoryv1alpha1.AssetReference{
+				{Kind: "Site", Name: siteA},
+				{Kind: "Site", Name: siteB},
+			},
+			Type: inventoryv1alpha1.LinkTypeLogical,
+		},
+	}
+}

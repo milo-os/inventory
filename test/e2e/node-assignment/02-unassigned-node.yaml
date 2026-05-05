@@ -1,0 +1,20 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: na-node-01
+spec:
+  siteRef:
+    name: na-site-sfo1
+  hardware:
+    cpuCores: 16
+    cpuArchitecture: amd64
+    memoryBytes: 68719476736
+    disks:
+      - name: nvme0n1
+        sizeBytes: 1099511627776
+        type: NVMe
+  addresses:
+    - type: Internal
+      address: 10.20.30.41
+    - type: Hostname
+      address: na-node-01.sfo1.internal

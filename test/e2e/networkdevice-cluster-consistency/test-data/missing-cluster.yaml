@@ -1,0 +1,11 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: NetworkDevice
+metadata:
+  name: ndc-device-ghost
+spec:
+  clusterRef:
+    name: ndc-cluster-does-not-exist
+  siteRef:
+    name: ndc-site-a
+  role: BorderRouter
+  managementAddress: 10.100.0.1

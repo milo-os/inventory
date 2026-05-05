@@ -1,0 +1,75 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: networkdevice-cluster-consistency
+spec:
+  description: |
+    Exercises NetworkDevice admission:
+    - A device whose siteRef matches the referenced cluster's
+      controlPlaneSiteRef is accepted.
+    - A device whose siteRef differs from the cluster's
+      controlPlaneSiteRef is ALSO accepted — clusters can span multiple
+      sites, so cross-site attachment is a legal topology.
+    - The webhook rejects a device whose clusterRef targets a cluster
+      that does not exist.
+
+  steps:
+    - name: setup
+      description: Create Region + two Sites + one Cluster whose control plane is at site-a.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: accept-matching-device
+      description: |
+        A NetworkDevice at site-a with clusterRef to the site-a cluster is
+        accepted and becomes Ready with topology labels.
+      try:
+        - create:
+            file: 02-matching-device.yaml
+        - assert:
+            file: assertions/assert-device-ready.yaml
+
+    - name: accept-cross-site-device
+      description: |
+        A NetworkDevice at site-b attached to a cluster whose control plane
+        lives at site-a is accepted: clusters span sites.
+      try:
+        - create:
+            file: test-data/mismatched-site.yaml
+
+    - name: reject-missing-cluster
+      description: |
+        A NetworkDevice referring to a non-existent Cluster must be rejected
+        by the validating webhook with a "not found" message.
+      try:
+        - create:
+            file: test-data/missing-cluster.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: cleanup-children
+      description: |
+        Delete the NetworkDevices and Cluster before chainsaw's automatic
+        cleanup tries to remove the Sites — the Site webhook would
+        otherwise reject their DELETE while children reference them.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: NetworkDevice
+              name: ndc-device-ok
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: NetworkDevice
+              name: ndc-device-cross-site
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Cluster
+              name: ndc-cluster-a

@@ -1,0 +1,10 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: rsl-site-iad1
+spec:
+  displayName: IAD1
+  regionRef:
+    name: rsl-region-useast
+  type: Datacenter
+  address: 44060 Digital Loudoun Plaza, Ashburn, VA

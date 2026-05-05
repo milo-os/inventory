@@ -1,0 +1,125 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-cluster
+  failurePolicy: Fail
+  name: vcluster.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - DELETE
+    resources:
+    - clusters
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-link
+  failurePolicy: Fail
+  name: vlink.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - links
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-networkdevice
+  failurePolicy: Fail
+  name: vnetworkdevice.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - networkdevices
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-node
+  failurePolicy: Fail
+  name: vnode.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - nodes
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-region
+  failurePolicy: Fail
+  name: vregion.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - DELETE
+    resources:
+    - regions
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-site
+  failurePolicy: Fail
+  name: vsite.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - sites
+  sideEffects: None

@@ -1,0 +1,39 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: ndc-region-eu
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ndc-site-a
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ndc-site-b
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cluster
+metadata:
+  name: ndc-cluster-a
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
