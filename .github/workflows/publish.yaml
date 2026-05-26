@@ -24,7 +24,8 @@ jobs:
       attestations: write
     uses: datum-cloud/actions/.github/workflows/publish-docker.yaml@v1.15.0
     with:
-      image-name: ghcr.io/milo-os/inventory
+      image-name: inventory
+      registry-organization: milo-os
     secrets: inherit
 
   publish-kustomize-bundles:
