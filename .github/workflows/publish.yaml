@@ -1,0 +1,47 @@
+name: Publish Inventory
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+
+  release:
+    types: ['published']
+
+jobs:
+  check-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+  publish-container-image:
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+      attestations: write
+    uses: datum-cloud/actions/.github/workflows/publish-docker.yaml@v1.15.0
+    with:
+      image-name: inventory
+      registry-organization: milo-os
+    secrets: inherit
+
+  publish-kustomize-bundles:
+    # Add explicit dependency so that the kustomize bundles only get published
+    # if the container image has been built successfully. This helps prevent
+    # situations where the deployment manifests are picked up by flux but the
+    # container is still being created.
+    needs: [publish-container-image]
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+    uses: datum-cloud/actions/.github/workflows/publish-kustomize-bundle.yaml@v1.15.0
+    with:
+      bundle-name: ghcr.io/milo-os/inventory-kustomize
+      bundle-path: config
+      image-overlays: config/base
+      image-name: ghcr.io/milo-os/inventory
+    secrets: inherit
