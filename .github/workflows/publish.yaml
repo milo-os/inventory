@@ -39,8 +39,8 @@ jobs:
       packages: write
     uses: datum-cloud/actions/.github/workflows/publish-kustomize-bundle.yaml@v1.15.0
     with:
-      bundle-name: ghcr.io/datum-cloud/inventory-kustomize
+      bundle-name: ghcr.io/milo-os/inventory-kustomize
       bundle-path: config
       image-overlays: config/base
-      image-name: ghcr.io/datum-cloud/inventory
+      image-name: ghcr.io/milo-os/inventory
     secrets: inherit
