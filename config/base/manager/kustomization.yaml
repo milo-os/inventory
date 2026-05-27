@@ -9,5 +9,5 @@ resources:
 - pdb.yaml
 
 images:
-- name: ghcr.io/datum-cloud/inventory
+- name: ghcr.io/milo-os/inventory
   newTag: latest
