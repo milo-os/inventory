@@ -49,6 +49,15 @@ record of what is declared", so an inconsistent DELETE should be rejected up
 front rather than leaving a zombie terminating object. See
 `internal/webhook/` and the webhook table in the plan.
 
+## Code Comments
+
+**Default to zero comments.** Well-named identifiers and the surrounding code
+should convey what the code does. Do not narrate changes, reference tasks/PRs,
+or annotate "added for X" / "removed Y".
+
+The only exception: if a passage is genuinely difficult for a human to
+comprehend, leave a single short comment that reads exactly `here be dragons`.
+
 ## License header
 
 Every Go file (including generated files -- see `hack/boilerplate.go.txt`)
