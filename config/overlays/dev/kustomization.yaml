@@ -16,8 +16,8 @@ components:
   - ../../components/leader_election
 
 images:
-  - name: ghcr.io/datum-cloud/inventory
-    newName: ghcr.io/datum-cloud/inventory
+  - name: ghcr.io/milo-os/inventory
+    newName: ghcr.io/milo-os/inventory
     newTag: dev
 
 patches:
