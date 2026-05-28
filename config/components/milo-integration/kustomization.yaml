@@ -9,9 +9,9 @@ kind: Component
 #     ClusterIssuer for authenticating to Milo.
 #   - Replaces the base webhook-cert Secret volume with a cert-manager CSI
 #     volume, also issued by the datum-control-plane ClusterIssuer.
-#   - Mounts a discovery kubeconfig ConfigMap that tells the controller how
+#   - Mounts a Milo kubeconfig ConfigMap that tells the controller how
 #     to reach Milo. Consumers must provide this ConfigMap (named
-#     inventory-discovery-kubeconfig) in the inventory-system namespace.
+#     inventory-milo-kubeconfig) in the inventory-system namespace.
 #
 # Consumers also need to ensure the inventory-system namespace has the label
 # `infra.datum.net/inject-datum-control-plane-trust-bundle: ""` so that
@@ -47,7 +47,7 @@ patches:
               - name: manager
                 env:
                   - name: KUBECONFIG
-                    value: /etc/kubernetes/project-discovery/auth/discovery-kubeconfig.yaml
+                    value: /etc/kubernetes/project-discovery/auth/milo-kubeconfig.yaml
                 volumeMounts:
                   - mountPath: /etc/kubernetes/pki/trust
                     name: trust-bundle
@@ -59,15 +59,15 @@ patches:
                     name: client-cert
                     readOnly: true
                   - mountPath: /etc/kubernetes/project-discovery/auth
-                    name: discovery-kubeconfig
+                    name: milo-kubeconfig
                     readOnly: true
             volumes:
               - name: trust-bundle
                 configMap:
                   name: datum-control-plane-trust-bundle
-              - name: discovery-kubeconfig
+              - name: milo-kubeconfig
                 configMap:
-                  name: inventory-discovery-kubeconfig
+                  name: inventory-milo-kubeconfig
               - name: webhook-cert
                 csi:
                   driver: csi.cert-manager.io
