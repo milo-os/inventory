@@ -45,6 +45,9 @@ patches:
           spec:
             containers:
               - name: manager
+                env:
+                  - name: KUBECONFIG
+                    value: /etc/kubernetes/project-discovery/auth/discovery-kubeconfig.yaml
                 volumeMounts:
                   - mountPath: /etc/kubernetes/pki/trust
                     name: trust-bundle
