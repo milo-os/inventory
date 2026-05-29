@@ -47,6 +47,13 @@ type SiteSpec struct {
 	//
 	// +optional
 	Address string `json:"address,omitempty"`
+
+	// ProviderRef optionally references the Provider that runs this Site
+	// (e.g. the colocation or hosting provider). Unlike RegionRef it is
+	// mutable, since a site can change providers.
+	//
+	// +optional
+	ProviderRef *LocalObjectReference `json:"providerRef,omitempty"`
 }
 
 // SiteStatus defines the observed state of Site.
@@ -71,12 +78,17 @@ const (
 
 	// SiteRegionNotFoundReason indicates the referenced Region does not exist.
 	SiteRegionNotFoundReason = "RegionNotFound"
+
+	// SiteProviderNotFoundReason indicates the referenced Provider does not
+	// exist.
+	SiteProviderNotFoundReason = "ProviderNotFound"
 )
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Region",type="string",JSONPath=".spec.regionRef.name"
+// +kubebuilder:printcolumn:name="Provider",type="string",JSONPath=".spec.providerRef.name"
 // +kubebuilder:printcolumn:name="Type",type="string",JSONPath=".spec.type"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=`.status.conditions[?(@.type=="Ready")].status`

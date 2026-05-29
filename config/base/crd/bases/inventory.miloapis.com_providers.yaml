@@ -4,22 +4,19 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.4
-  name: sites.inventory.miloapis.com
+  name: providers.inventory.miloapis.com
 spec:
   group: inventory.miloapis.com
   names:
-    kind: Site
-    listKind: SiteList
-    plural: sites
-    singular: site
+    kind: Provider
+    listKind: ProviderList
+    plural: providers
+    singular: provider
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.regionRef.name
-      name: Region
-      type: string
-    - jsonPath: .spec.providerRef.name
-      name: Provider
+    - jsonPath: .spec.displayName
+      name: Display
       type: string
     - jsonPath: .spec.type
       name: Type
@@ -37,8 +34,9 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          Site is the Schema for the sites API. A Site belongs to exactly one Region
-          and is the parent of Nodes, Clusters, and NetworkDevices.
+          Provider is the Schema for the providers API. A Provider records an
+          infrastructure provider relationship (hosting, colo, transit, IX, dark
+          fiber, cloud) and has no parent references.
         properties:
           apiVersion:
             description: |-
@@ -58,57 +56,71 @@ spec:
           metadata:
             type: object
           spec:
-            description: SiteSpec defines the desired state of Site.
+            description: ProviderSpec defines the desired state of Provider.
             properties:
-              address:
-                description: Address is an optional free-form postal/street address
-                  for the site.
-                type: string
+              contract:
+                description: Contract optionally records contract metadata.
+                properties:
+                  accountID:
+                    description: AccountID is the operator's account identifier with
+                      the provider.
+                    type: string
+                  contractID:
+                    description: ContractID is the provider's contract or agreement
+                      identifier.
+                    type: string
+                  notes:
+                    description: Notes is free-form contract context.
+                    type: string
+                  portalURL:
+                    description: |-
+                      PortalURL is an optional link to the provider's management portal.
+                      When set it must be an http:// or https:// URL.
+                    pattern: ^https?://.+$
+                    type: string
+                type: object
               displayName:
-                description: DisplayName is a human-readable name for the site.
+                description: DisplayName is a human-readable name for the provider.
                 minLength: 1
                 type: string
-              providerRef:
+              serviceIdentifiers:
                 description: |-
-                  ProviderRef optionally references the Provider that runs this Site
-                  (e.g. the colocation or hosting provider). Unlike RegionRef it is
-                  mutable, since a site can change providers.
-                properties:
-                  name:
-                    description: Name of the referenced object.
-                    minLength: 1
-                    type: string
-                required:
-                - name
-                type: object
-              regionRef:
-                description: |-
-                  RegionRef references the Region this Site belongs to. This field is
-                  immutable after creation.
-                properties:
-                  name:
-                    description: Name of the referenced object.
-                    minLength: 1
-                    type: string
-                required:
-                - name
-                type: object
+                  ServiceIdentifiers is an optional list of named identifiers the
+                  provider assigns to services.
+                items:
+                  description: |-
+                    ServiceIdentifier is a named identifier the provider assigns to a service
+                    (e.g. {"ASN","64512"}, {"LOA-CFA","..."}). The inventory does not
+                    interpret these; they are queryable metadata.
+                  properties:
+                    identifier:
+                      description: Identifier is the value the provider assigned.
+                      minLength: 1
+                      type: string
+                    name:
+                      description: Name is the identifier's label (e.g. "ASN", "LOA-CFA").
+                      minLength: 1
+                      type: string
+                  required:
+                  - identifier
+                  - name
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
               type:
-                description: Type classifies the Site.
+                description: Type classifies the provider relationship.
                 enum:
-                - Datacenter
-                - AvailabilityZone
-                - Edge
-                - Virtual
+                - Hosting
+                - Colocation
+                - Transit
+                - InternetExchange
+                - DarkFiber
+                - Cloud
                 type: string
             required:
             - displayName
-            - regionRef
             - type
             type: object
-            x-kubernetes-validations:
-            - message: regionRef is immutable
-              rule: self.regionRef == oldSelf.regionRef
           status:
             default:
               conditions:
@@ -117,11 +129,11 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: SiteStatus defines the observed state of Site.
+            description: ProviderStatus defines the observed state of Provider.
             properties:
               conditions:
                 description: |-
-                  Represents the observations of a site's current state.
+                  Represents the observations of a provider's current state.
                   Known condition types are: "Ready".
                 items:
                   description: Condition contains details for one aspect of the current

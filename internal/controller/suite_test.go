@@ -91,6 +91,10 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr)).To(Succeed())
+	Expect((&inventorycontroller.ProviderReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)).To(Succeed())
 	Expect((&inventorycontroller.SiteReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -113,6 +117,7 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)).To(Succeed())
 
 	Expect(webhookv1alpha1.SetupRegionWebhookWithManager(mgr)).To(Succeed())
+	Expect(webhookv1alpha1.SetupProviderWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupSiteWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupClusterWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupNodeWebhookWithManager(mgr)).To(Succeed())
