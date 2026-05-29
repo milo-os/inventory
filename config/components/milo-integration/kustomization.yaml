@@ -52,7 +52,7 @@ patches:
                   - mountPath: /etc/kubernetes/pki/trust
                     name: trust-bundle
                     readOnly: true
-                  - mountPath: /etc/kubernetes/pki/webhook
+                  - mountPath: /tmp/k8s-webhook-server/serving-certs
                     name: webhook-cert
                     readOnly: true
                   - mountPath: /etc/kubernetes/projects/pki/client
