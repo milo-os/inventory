@@ -3,6 +3,7 @@
 # It should be run by an overlay under config/overlays/
 resources:
 - bases/inventory.miloapis.com_regions.yaml
+- bases/inventory.miloapis.com_providers.yaml
 - bases/inventory.miloapis.com_sites.yaml
 - bases/inventory.miloapis.com_clusters.yaml
 - bases/inventory.miloapis.com_nodes.yaml

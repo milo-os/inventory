@@ -37,6 +37,7 @@ type SiteReconciler struct {
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=sites,verbs=get;list;watch;patch;update
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=sites/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=regions,verbs=get;list;watch
+// +kubebuilder:rbac:groups=inventory.miloapis.com,resources=providers,verbs=get;list;watch
 
 // Reconcile implements reconcile.Reconciler.
 func (r *SiteReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -66,6 +67,27 @@ func (r *SiteReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	case err != nil:
 		log.Error(err, "failed to get referenced Region", "region", site.Spec.RegionRef.Name)
 		return ctrl.Result{}, err
+	}
+
+	if site.Spec.ProviderRef != nil {
+		provider := &inventoryv1alpha1.Provider{}
+		err := r.Get(ctx, client.ObjectKey{Name: site.Spec.ProviderRef.Name}, provider)
+		switch {
+		case apierrors.IsNotFound(err):
+			SetNotReady(
+				site.GetGeneration(),
+				&site.Status.Conditions,
+				inventoryv1alpha1.SiteProviderNotFoundReason,
+				fmt.Sprintf("Provider %q not found", site.Spec.ProviderRef.Name),
+			)
+			if statusErr := r.patchStatusIfChanged(ctx, originalStatus, site); statusErr != nil {
+				return ctrl.Result{}, statusErr
+			}
+			return ctrl.Result{RequeueAfter: requeueAfterMissingRef}, nil
+		case err != nil:
+			log.Error(err, "failed to get referenced Provider", "provider", site.Spec.ProviderRef.Name)
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Region exists — propagate labels onto the Site itself.
@@ -117,11 +139,31 @@ func (r *SiteReconciler) enqueueForRegion(ctx context.Context, obj client.Object
 	return reqs
 }
 
+// enqueueForProvider returns the Sites whose spec.providerRef.name matches
+// the given Provider's name. Called on Provider Create/Update/Delete events.
+func (r *SiteReconciler) enqueueForProvider(ctx context.Context, obj client.Object) []reconcile.Request {
+	provider, ok := obj.(*inventoryv1alpha1.Provider)
+	if !ok {
+		return nil
+	}
+	sites := &inventoryv1alpha1.SiteList{}
+	if err := r.List(ctx, sites, client.MatchingFields{IndexSiteProviderRef: provider.Name}); err != nil {
+		logf.FromContext(ctx).Error(err, "listing Sites for Provider", "provider", provider.Name)
+		return nil
+	}
+	reqs := make([]reconcile.Request, 0, len(sites.Items))
+	for _, s := range sites.Items {
+		reqs = append(reqs, reconcile.Request{NamespacedName: types.NamespacedName{Name: s.Name}})
+	}
+	return reqs
+}
+
 // SetupWithManager registers the Site controller with the supplied manager.
 func (r *SiteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&inventoryv1alpha1.Site{}).
 		Watches(&inventoryv1alpha1.Region{}, handler.EnqueueRequestsFromMapFunc(r.enqueueForRegion)).
+		Watches(&inventoryv1alpha1.Provider{}, handler.EnqueueRequestsFromMapFunc(r.enqueueForProvider)).
 		Named("site").
 		Complete(r)
 }

@@ -98,6 +98,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Region")
 		os.Exit(1)
 	}
+	if err := (&inventorycontroller.ProviderReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Provider")
+		os.Exit(1)
+	}
 	if err := (&inventorycontroller.SiteReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -136,6 +143,10 @@ func main() {
 
 	if err := webhookv1alpha1.SetupRegionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Region")
+		os.Exit(1)
+	}
+	if err := webhookv1alpha1.SetupProviderWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Provider")
 		os.Exit(1)
 	}
 	if err := webhookv1alpha1.SetupSiteWebhookWithManager(mgr); err != nil {

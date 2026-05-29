@@ -25,6 +25,7 @@ rules:
   - links/status
   - networkdevices/status
   - nodes/status
+  - providers/status
   - regions/status
   - sites/status
   verbs:
@@ -34,6 +35,7 @@ rules:
 - apiGroups:
   - inventory.miloapis.com
   resources:
+  - providers
   - regions
   verbs:
   - get
