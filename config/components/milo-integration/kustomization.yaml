@@ -30,9 +30,6 @@ patches:
         path: /spec/template/spec/containers/0/volumeMounts/0
       - op: remove
         path: /spec/template/spec/volumes/0
-      - op: replace
-        path: /spec/template/spec/containers/0/args/1
-        value: --leader-elect-namespace=milo-system
   # Add the Milo-specific volumes, volumeMounts, and the CSI-based webhook
   # cert that replaces the removed Secret-based one.
   - target:
@@ -51,6 +48,8 @@ patches:
                 env:
                   - name: KUBECONFIG
                     value: /etc/kubernetes/project-discovery/auth/milo-kubeconfig.yaml
+                  - name: LEADER_ELECT_NAMESPACE
+                    value: milo-system
                 volumeMounts:
                   - mountPath: /etc/kubernetes/pki/trust
                     name: trust-bundle
