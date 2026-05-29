@@ -1,9 +1,9 @@
 # Inventory Operator -- Claude Code guide
 
-This repo is a Kubernetes operator implementing Datum Cloud's **Asset Inventory**
-under the API group `inventory.miloapis.com/v1alpha1`. It is a pure-data-model
-registry -- no agents, no provisioning, no provider integrations. Controllers
-only validate cross-resource references and propagate topology labels.
+This repo is a Kubernetes operator implementing the **Asset Inventory** API
+under `inventory.miloapis.com/v1alpha1`. It is a pure-data-model registry --
+no agents, no provisioning, no provider integrations. Controllers only
+validate cross-resource references and propagate topology labels.
 
 ## Stack
 
@@ -13,8 +13,7 @@ only validate cross-resource references and propagate topology labels.
 - **Build tool**: [go-task](https://taskfile.dev) via `Taskfile.yaml` -- **not
   make**. There is no Makefile.
 - **E2E**: [chainsaw](https://github.com/kyverno/chainsaw) tests under
-  `test/e2e/`, run against a [datum-cloud/test-infra](https://github.com/datum-cloud/test-infra)
-  kind cluster
+  `test/e2e/`, run against a kind cluster
 
 ## API conventions
 
@@ -103,21 +102,22 @@ gitignored; do not commit it.
 
 ## Deployment & Milo integration
 
-How this operator runs in Datum Infra is non-obvious; mis-modeling it causes
-crash loops (see issues #9, #13).
+How this operator is deployed is non-obvious; mis-modeling it causes crash
+loops (see issues #9, #13).
 
 - The operator is deployed as **two OCI artifacts** built by CI from this repo:
   the `inventory` **container image** and the `inventory-kustomize` **config
   bundle** (`config/`, image tag baked in). A change under `config/` ships in
   the **bundle**, not the image.
-- The manager **runs on the Datum Infra cluster** but its API client targets
-  the **Milo control plane** (`KUBECONFIG=.../milo-kubeconfig.yaml`, set by the
-  `milo-integration` component). So:
+- The manager pod and the **Milo control plane** it targets live on
+  **different clusters**. The pod's API client is pointed at Milo via
+  `KUBECONFIG=.../milo-kubeconfig.yaml`, set by the `milo-integration`
+  component. So:
   - The CRDs and `ValidatingWebhookConfiguration` live **on Milo**, applied by a
     separate Flux Kustomization (`base/crd` + `webhook` component) — not on the
     cluster the pod runs in.
   - **Leader election** writes its `Lease` on Milo. `inventory-system` exists
-    on the infra cluster, not Milo, so the base default would fail with
+    on the pod's local cluster, not Milo, so the base default would fail with
     `namespaces "inventory-system" not found`. The base sets
     `--leader-elect-namespace=$(LEADER_ELECT_NAMESPACE)` with a default env of
     `inventory-system`; `milo-integration` overrides the env to `milo-system`
@@ -129,12 +129,6 @@ crash loops (see issues #9, #13).
 - `milo-integration` is a **kustomize Component** patching the base Deployment.
   Prefer strategic-merge env/volume patches (matched by name) over positional
   JSON6902 patches, which break when base ordering changes.
-- The infra side (OCIRepository semverFilter, the `inventory` /
-  `inventory-manager` / `inventory-milo-control-plane` Kustomizations, staging
-  vs production) is documented in
-  [datum-cloud/infra `apps/inventory/README.md`](https://github.com/datum-cloud/infra/tree/main/apps/inventory).
-  Staging follows `main` prerelease builds; let Flux converge — do not force a
-  reconcile.
 
 ## Code Comments
 
@@ -158,5 +152,3 @@ starts with:
 
 - Design plan (rationale, CRD shapes, controller/webhook contracts, e2e
   suites): `/Users/scotwells/.claude/plans/happy-hugging-sky.md`
-- Source enhancement: [github.com/datum-cloud/infra/docs/enhancements/infrastructure-platform/asset-inventory](https://github.com/datum-cloud/infra/tree/main/docs/enhancements/infrastructure-platform/asset-inventory)
-- Layout/tooling reference: [datum-cloud/billing](https://github.com/datum-cloud/billing/tree/feat/03-implementation) (branch `feat/03-implementation`)
