@@ -9,16 +9,18 @@ The hierarchy:
 
 ```
 Region
-  └── Site               (regionRef)
+  └── Site               (regionRef; optional providerRef to a Provider)
         ├── Cluster       (controlPlaneSiteRef)
-        ├── Node          (siteRef; optional assignment → Cluster)
+        ├── Node          (siteRef; optional assignment to a Cluster)
         └── NetworkDevice (siteRef + clusterRef)
+Provider                  (referenced by Site.providerRef)
 Link                      (connects two of: Site, Cluster, NetworkDevice)
 ```
 
 | Kind | Summary |
 |------|---------|
 | [Region](region.md) | Top-level geographic grouping. |
+| [Provider](provider.md) | An infrastructure provider (hosting, colo, transit, IX, dark fiber, cloud). |
 | [Site](site.md) | A facility / AZ / edge location within a Region. |
 | [Cluster](cluster.md) | A Kubernetes cluster; its control plane lives at one Site. |
 | [Node](node.md) | A physical/virtual machine in a Site, optionally assigned to a Cluster. |
