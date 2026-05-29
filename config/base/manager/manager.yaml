@@ -42,9 +42,12 @@ spec:
         - /inventory
         args:
           - --leader-elect
-          - --leader-elect-namespace=inventory-system
+          - --leader-elect-namespace=$(LEADER_ELECT_NAMESPACE)
           - --metrics-bind-address=:8080
           - --health-probe-bind-address=:8081
+        env:
+          - name: LEADER_ELECT_NAMESPACE
+            value: inventory-system
         image: ghcr.io/milo-os/inventory:dev
         name: manager
         ports:
