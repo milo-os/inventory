@@ -10,6 +10,7 @@ vars:
   DEFAULTER_GEN_VERSION: "v0.32.3"
   GOLANGCI_LINT_VERSION: "v2.1.5"
   CHAINSAW_VERSION: "v0.2.12"
+  CRDOC_VERSION: "v0.6.4"
   SETUP_ENVTEST_VERSION: "latest"
   # ENVTEST_K8S_VERSION controls which Kubernetes binaries (kube-apiserver,
   # etcd, kubectl) setup-envtest downloads for envtest-backed unit tests.
@@ -58,6 +59,19 @@ tasks:
           output:rbac:artifacts:config=config/components/controller_rbac \
           output:webhook:artifacts:config=config/base/webhook
         echo "Manifests generated!"
+    deps:
+      - install-tools
+    silent: true
+
+  api-docs:
+    desc: Generate the API reference (docs/api/inventory.md) from the CRDs
+    cmds:
+      - |
+        set -e
+        echo "Generating API docs..."
+        mkdir -p docs/api
+        {{.TOOL_DIR}}/crdoc --resources config/base/crd/bases --output docs/api/inventory.md
+        echo "API docs generated!"
     deps:
       - install-tools
     silent: true
@@ -148,6 +162,14 @@ tasks:
         fi
         ln -sf {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}} {{.TOOL_DIR}}/chainsaw
 
+        # crdoc — renders CRDs into the API reference (docs/api)
+        if [ ! -f "{{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}" ]; then
+          echo "Installing crdoc {{.CRDOC_VERSION}}..."
+          GOBIN={{.TOOL_DIR}} go install fybrik.io/crdoc@{{.CRDOC_VERSION}}
+          mv {{.TOOL_DIR}}/crdoc {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}
+        fi
+        ln -sf {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}} {{.TOOL_DIR}}/crdoc
+
         # setup-envtest — downloads kube-apiserver/etcd binaries for envtest
         # unit tests. Module is versioned loosely against controller-runtime
         # so we pin to "latest" rather than a semver.
@@ -161,6 +183,7 @@ tasks:
       - test -f {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}}
       - test -f {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}}
       - test -f {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}}
+      - test -f {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}
       - test -f {{.TOOL_DIR}}/setup-envtest
 
   # Development tasks
