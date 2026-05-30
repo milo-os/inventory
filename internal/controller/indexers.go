@@ -23,8 +23,6 @@ const (
 	// IndexSiteRegionRef indexes Sites by .spec.regionRef.name.
 	IndexSiteRegionRef = "spec.regionRef.name"
 
-	// IndexSiteProviderRef indexes Sites by .spec.providerRef.name. Sites
-	// without a providerRef are not indexed under this key.
 	IndexSiteProviderRef = "spec.providerRef.name"
 
 	// IndexClusterControlPlaneSiteRef indexes Clusters by

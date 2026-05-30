@@ -48,10 +48,6 @@ type SiteSpec struct {
 	// +optional
 	Address string `json:"address,omitempty"`
 
-	// ProviderRef optionally references the Provider that runs this Site
-	// (e.g. the colocation or hosting provider). Unlike RegionRef it is
-	// mutable, since a site can change providers.
-	//
 	// +optional
 	ProviderRef *LocalObjectReference `json:"providerRef,omitempty"`
 }
@@ -79,8 +75,6 @@ const (
 	// SiteRegionNotFoundReason indicates the referenced Region does not exist.
 	SiteRegionNotFoundReason = "RegionNotFound"
 
-	// SiteProviderNotFoundReason indicates the referenced Provider does not
-	// exist.
 	SiteProviderNotFoundReason = "ProviderNotFound"
 )
 

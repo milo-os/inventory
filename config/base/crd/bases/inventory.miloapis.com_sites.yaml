@@ -70,9 +70,10 @@ spec:
                 type: string
               providerRef:
                 description: |-
-                  ProviderRef optionally references the Provider that runs this Site
-                  (e.g. the colocation or hosting provider). Unlike RegionRef it is
-                  mutable, since a site can change providers.
+                  LocalObjectReference is a reference to another cluster-scoped object in the
+                  inventory.miloapis.com API group by name. All inventory cross-resource
+                  references use this type rather than raw strings so that CRD schemas are
+                  explicit about intent.
                 properties:
                   name:
                     description: Name of the referenced object.

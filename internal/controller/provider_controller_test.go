@@ -53,9 +53,6 @@ var _ = Describe("Provider Controller", func() {
 	It("rejects deletion while a Site references it", func() {
 		regionName := uniqueName("region")
 		siteName := uniqueName("site")
-		// Region is cleaned up after the AfterEach deleteProvider runs; the
-		// Site must be removed within this spec so that deleteProvider is no
-		// longer blocked by the time AfterEach runs.
 		DeferCleanup(func() { deleteRegion(regionName) })
 
 		Expect(k8sClient.Create(testCtx, makeRegion(regionName))).To(Succeed())

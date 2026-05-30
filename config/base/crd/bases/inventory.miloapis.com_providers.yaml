@@ -33,10 +33,6 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: |-
-          Provider is the Schema for the providers API. A Provider records an
-          infrastructure provider relationship (hosting, colo, transit, IX, dark
-          fiber, cloud) and has no parent references.
         properties:
           apiVersion:
             description: |-
@@ -56,49 +52,29 @@ spec:
           metadata:
             type: object
           spec:
-            description: ProviderSpec defines the desired state of Provider.
             properties:
               contract:
-                description: Contract optionally records contract metadata.
                 properties:
                   accountID:
-                    description: AccountID is the operator's account identifier with
-                      the provider.
                     type: string
                   contractID:
-                    description: ContractID is the provider's contract or agreement
-                      identifier.
                     type: string
                   notes:
-                    description: Notes is free-form contract context.
                     type: string
                   portalURL:
-                    description: |-
-                      PortalURL is an optional link to the provider's management portal.
-                      When set it must be an http:// or https:// URL.
                     pattern: ^https?://.+$
                     type: string
                 type: object
               displayName:
-                description: DisplayName is a human-readable name for the provider.
                 minLength: 1
                 type: string
               serviceIdentifiers:
-                description: |-
-                  ServiceIdentifiers is an optional list of named identifiers the
-                  provider assigns to services.
                 items:
-                  description: |-
-                    ServiceIdentifier is a named identifier the provider assigns to a service
-                    (e.g. {"ASN","64512"}, {"LOA-CFA","..."}). The inventory does not
-                    interpret these; they are queryable metadata.
                   properties:
                     identifier:
-                      description: Identifier is the value the provider assigned.
                       minLength: 1
                       type: string
                     name:
-                      description: Name is the identifier's label (e.g. "ASN", "LOA-CFA").
                       minLength: 1
                       type: string
                   required:
@@ -108,7 +84,6 @@ spec:
                 type: array
                 x-kubernetes-list-type: atomic
               type:
-                description: Type classifies the provider relationship.
                 enum:
                 - Hosting
                 - Colocation
@@ -129,12 +104,8 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: ProviderStatus defines the observed state of Provider.
             properties:
               conditions:
-                description: |-
-                  Represents the observations of a provider's current state.
-                  Known condition types are: "Ready".
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.

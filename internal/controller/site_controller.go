@@ -139,8 +139,6 @@ func (r *SiteReconciler) enqueueForRegion(ctx context.Context, obj client.Object
 	return reqs
 }
 
-// enqueueForProvider returns the Sites whose spec.providerRef.name matches
-// the given Provider's name. Called on Provider Create/Update/Delete events.
 func (r *SiteReconciler) enqueueForProvider(ctx context.Context, obj client.Object) []reconcile.Request {
 	provider, ok := obj.(*inventoryv1alpha1.Provider)
 	if !ok {

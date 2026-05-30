@@ -44,7 +44,6 @@ func deleteSite(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, s))).To(Succeed())
 }
 
-// deleteProvider deletes a Provider ignoring NotFound.
 func deleteProvider(name string) {
 	p := &inventoryv1alpha1.Provider{}
 	p.Name = name
@@ -101,7 +100,6 @@ func makeSite(name, regionName string, siteType inventoryv1alpha1.SiteType) *inv
 	}
 }
 
-// makeProvider returns a Provider with the given name that is ready to Create.
 func makeProvider(name string) *inventoryv1alpha1.Provider {
 	return &inventoryv1alpha1.Provider{
 		ObjectMeta: metav1.ObjectMeta{Name: name},

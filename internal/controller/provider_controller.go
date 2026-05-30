@@ -13,11 +13,6 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-// ProviderReconciler reconciles Provider objects.
-//
-// Providers are a top-level inventory kind with no cross-resource
-// references, so the reconciler does nothing beyond marking them Ready so
-// that kubectl Ready columns reflect acceptance.
 type ProviderReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
@@ -26,7 +21,6 @@ type ProviderReconciler struct {
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=providers,verbs=get;list;watch
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=providers/status,verbs=get;update;patch
 
-// Reconcile implements reconcile.Reconciler.
 func (r *ProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := logf.FromContext(ctx)
 
@@ -51,8 +45,6 @@ func (r *ProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return ctrl.Result{}, nil
 }
 
-// SetupWithManager registers the Provider controller with the supplied
-// manager. SetupIndexers must have already been called.
 func (r *ProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&inventoryv1alpha1.Provider{}).

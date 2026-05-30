@@ -20,27 +20,20 @@ import (
 
 var providerLog = logf.Log.WithName("provider-webhook")
 
-// ProviderValidator validates Provider DELETE operations. It rejects
-// deletion whenever any Site references the Provider via
-// `.spec.providerRef.name`.
 type ProviderValidator struct {
 	Client client.Client
 }
 
 var _ admission.Validator[*inventoryv1alpha1.Provider] = &ProviderValidator{}
 
-// ValidateCreate is a no-op. CEL on the type handles structural validation.
 func (v *ProviderValidator) ValidateCreate(ctx context.Context, obj *inventoryv1alpha1.Provider) (admission.Warnings, error) {
 	return nil, nil
 }
 
-// ValidateUpdate is a no-op. CEL on the type handles structural validation.
 func (v *ProviderValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *inventoryv1alpha1.Provider) (admission.Warnings, error) {
 	return nil, nil
 }
 
-// ValidateDelete rejects the deletion when any Site still references this
-// Provider.
 func (v *ProviderValidator) ValidateDelete(ctx context.Context, provider *inventoryv1alpha1.Provider) (admission.Warnings, error) {
 	providerLog.Info("validating delete", "name", provider.Name)
 
@@ -58,8 +51,6 @@ func (v *ProviderValidator) ValidateDelete(ctx context.Context, provider *invent
 	return nil, nil
 }
 
-// SetupProviderWebhookWithManager registers the ProviderValidator with the
-// manager.
 func SetupProviderWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr, &inventoryv1alpha1.Provider{}).
 		WithValidator(&ProviderValidator{Client: mgr.GetClient()}).
