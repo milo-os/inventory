@@ -23,6 +23,8 @@ const (
 	// IndexSiteRegionRef indexes Sites by .spec.regionRef.name.
 	IndexSiteRegionRef = "spec.regionRef.name"
 
+	IndexSiteProviderRef = "spec.providerRef.name"
+
 	// IndexClusterControlPlaneSiteRef indexes Clusters by
 	// .spec.controlPlaneSiteRef.name (the Site hosting the API server).
 	IndexClusterControlPlaneSiteRef = "spec.controlPlaneSiteRef.name"
@@ -63,6 +65,16 @@ func SetupIndexers(ctx context.Context, mgr ctrl.Manager) error {
 		return []string{site.Spec.RegionRef.Name}
 	}); err != nil {
 		return fmt.Errorf("indexing Site.%s: %w", IndexSiteRegionRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Site{}, IndexSiteProviderRef, func(obj client.Object) []string {
+		site, ok := obj.(*inventoryv1alpha1.Site)
+		if !ok || site.Spec.ProviderRef == nil || site.Spec.ProviderRef.Name == "" {
+			return nil
+		}
+		return []string{site.Spec.ProviderRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing Site.%s: %w", IndexSiteProviderRef, err)
 	}
 
 	if err := idx.IndexField(ctx, &inventoryv1alpha1.Cluster{}, IndexClusterControlPlaneSiteRef, func(obj client.Object) []string {

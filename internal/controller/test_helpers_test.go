@@ -44,6 +44,12 @@ func deleteSite(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, s))).To(Succeed())
 }
 
+func deleteProvider(name string) {
+	p := &inventoryv1alpha1.Provider{}
+	p.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, p))).To(Succeed())
+}
+
 // deleteCluster deletes a Cluster ignoring NotFound.
 func deleteCluster(name string) {
 	c := &inventoryv1alpha1.Cluster{}
@@ -90,6 +96,16 @@ func makeSite(name, regionName string, siteType inventoryv1alpha1.SiteType) *inv
 			DisplayName: "Test Site " + name,
 			RegionRef:   inventoryv1alpha1.LocalObjectReference{Name: regionName},
 			Type:        siteType,
+		},
+	}
+}
+
+func makeProvider(name string) *inventoryv1alpha1.Provider {
+	return &inventoryv1alpha1.Provider{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.ProviderSpec{
+			DisplayName: "Test Provider " + name,
+			Type:        inventoryv1alpha1.ProviderTypeColocation,
 		},
 	}
 }

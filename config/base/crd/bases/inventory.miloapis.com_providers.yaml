@@ -4,22 +4,19 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.4
-  name: sites.inventory.miloapis.com
+  name: providers.inventory.miloapis.com
 spec:
   group: inventory.miloapis.com
   names:
-    kind: Site
-    listKind: SiteList
-    plural: sites
-    singular: site
+    kind: Provider
+    listKind: ProviderList
+    plural: providers
+    singular: provider
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.regionRef.name
-      name: Region
-      type: string
-    - jsonPath: .spec.providerRef.name
-      name: Provider
+    - jsonPath: .spec.displayName
+      name: Display
       type: string
     - jsonPath: .spec.type
       name: Type
@@ -36,9 +33,6 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: |-
-          Site is the Schema for the sites API. A Site belongs to exactly one Region
-          and is the parent of Nodes, Clusters, and NetworkDevices.
         properties:
           apiVersion:
             description: |-
@@ -58,58 +52,50 @@ spec:
           metadata:
             type: object
           spec:
-            description: SiteSpec defines the desired state of Site.
             properties:
-              address:
-                description: Address is an optional free-form postal/street address
-                  for the site.
-                type: string
+              contract:
+                properties:
+                  accountID:
+                    type: string
+                  contractID:
+                    type: string
+                  notes:
+                    type: string
+                  portalURL:
+                    pattern: ^https?://.+$
+                    type: string
+                type: object
               displayName:
-                description: DisplayName is a human-readable name for the site.
                 minLength: 1
                 type: string
-              providerRef:
-                description: |-
-                  LocalObjectReference is a reference to another cluster-scoped object in the
-                  inventory.miloapis.com API group by name. All inventory cross-resource
-                  references use this type rather than raw strings so that CRD schemas are
-                  explicit about intent.
-                properties:
-                  name:
-                    description: Name of the referenced object.
-                    minLength: 1
-                    type: string
-                required:
-                - name
-                type: object
-              regionRef:
-                description: |-
-                  RegionRef references the Region this Site belongs to. This field is
-                  immutable after creation.
-                properties:
-                  name:
-                    description: Name of the referenced object.
-                    minLength: 1
-                    type: string
-                required:
-                - name
-                type: object
+              serviceIdentifiers:
+                items:
+                  properties:
+                    identifier:
+                      minLength: 1
+                      type: string
+                    name:
+                      minLength: 1
+                      type: string
+                  required:
+                  - identifier
+                  - name
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
               type:
-                description: Type classifies the Site.
                 enum:
-                - Datacenter
-                - AvailabilityZone
-                - Edge
-                - Virtual
+                - Hosting
+                - Colocation
+                - Transit
+                - InternetExchange
+                - DarkFiber
+                - Cloud
                 type: string
             required:
             - displayName
-            - regionRef
             - type
             type: object
-            x-kubernetes-validations:
-            - message: regionRef is immutable
-              rule: self.regionRef == oldSelf.regionRef
           status:
             default:
               conditions:
@@ -118,12 +104,8 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: SiteStatus defines the observed state of Site.
             properties:
               conditions:
-                description: |-
-                  Represents the observations of a site's current state.
-                  Known condition types are: "Ready".
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
