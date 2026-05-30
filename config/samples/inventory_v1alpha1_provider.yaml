@@ -10,7 +10,7 @@ spec:
   type: Colocation
   contract:
     contractID: EQ-12345
-    accountID: 987654
+    accountID: "987654"
     portalURL: https://portal.equinix.com
     notes: Primary colo provider for US East
   serviceIdentifiers:
