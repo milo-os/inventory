@@ -11,6 +11,7 @@ rules:
   - links
   - networkdevices
   - nodes
+  - racks
   - sites
   verbs:
   - get
@@ -26,6 +27,7 @@ rules:
   - networkdevices/status
   - nodes/status
   - providers/status
+  - racks/status
   - regions/status
   - sites/status
   verbs:

@@ -17,11 +17,10 @@ import (
 
 var nodeLog = logf.Log.WithName("node-webhook")
 
-// NodeValidator validates Node CREATE/UPDATE operations. v0.1 immutability
-// (siteRef) and enum checks are handled by CEL on the type, so this validator
-// is currently a pass-through. It is kept so future cross-resource checks
-// (for example, validating that `spec.assignment.clusterRef` is consistent
-// with `spec.assignment.role`) have a home.
+// NodeValidator validates Node CREATE/UPDATE operations. Immutability
+// (siteRef) and enum checks are handled by CEL on the type; this validator
+// enforces the cross-resource placement rules (rack existence, fit, and
+// non-overlap) that CEL cannot express.
 type NodeValidator struct {
 	Client client.Client
 }
@@ -29,12 +28,12 @@ type NodeValidator struct {
 var _ admission.Validator[*inventoryv1alpha1.Node] = &NodeValidator{}
 
 func (v *NodeValidator) ValidateCreate(ctx context.Context, obj *inventoryv1alpha1.Node) (admission.Warnings, error) {
-	_ = nodeLog
-	return nil, nil
+	nodeLog.Info("validating create", "name", obj.Name)
+	return nil, validatePlacement(ctx, v.Client, obj.Spec.Placement, "Node", obj.Name)
 }
 
 func (v *NodeValidator) ValidateUpdate(ctx context.Context, oldObj, newObj *inventoryv1alpha1.Node) (admission.Warnings, error) {
-	return nil, nil
+	return nil, validatePlacement(ctx, v.Client, newObj.Spec.Placement, "Node", newObj.Name)
 }
 
 func (v *NodeValidator) ValidateDelete(ctx context.Context, obj *inventoryv1alpha1.Node) (admission.Warnings, error) {

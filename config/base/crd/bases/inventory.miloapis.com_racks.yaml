@@ -4,26 +4,29 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.4
-  name: networkdevices.inventory.miloapis.com
+  name: racks.inventory.miloapis.com
 spec:
   group: inventory.miloapis.com
   names:
-    kind: NetworkDevice
-    listKind: NetworkDeviceList
-    plural: networkdevices
-    singular: networkdevice
+    kind: Rack
+    listKind: RackList
+    plural: racks
+    singular: rack
   scope: Cluster
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.siteRef.name
       name: Site
       type: string
-    - jsonPath: .spec.clusterRef.name
-      name: Cluster
+    - jsonPath: .spec.cage
+      name: Cage
       type: string
-    - jsonPath: .spec.role
-      name: Role
+    - jsonPath: .spec.row
+      name: Row
       type: string
+    - jsonPath: .spec.heightU
+      name: HeightU
+      type: integer
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
@@ -37,9 +40,8 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          NetworkDevice is the Schema for the networkdevices API. A NetworkDevice is
-          a switch, router, or firewall that is part of a Cluster and physically
-          lives in a Site.
+          Rack is the Schema for the racks API. A Rack belongs to exactly one Site and
+          is the mount point for placed Nodes and NetworkDevices.
         properties:
           apiVersion:
             description: |-
@@ -59,80 +61,64 @@ spec:
           metadata:
             type: object
           spec:
-            description: NetworkDeviceSpec defines the desired state of NetworkDevice.
+            description: |-
+              RackSpec defines the desired state of Rack. Cage and row are modeled as
+              free-form attributes rather than their own kinds to avoid kind explosion.
             properties:
-              clusterRef:
-                description: |-
-                  ClusterRef references the Cluster this device is part of. This field
-                  is immutable after creation.
-                properties:
-                  name:
-                    description: Name of the referenced object.
-                    minLength: 1
-                    type: string
-                required:
-                - name
-                type: object
-              managementAddress:
-                description: |-
-                  ManagementAddress is an optional address at which operators can reach
-                  the device's management plane. The inventory does not connect to it.
+              cage:
+                description: Cage is the free-form cage identifier within the Site.
                 type: string
-              placement:
+              heightU:
                 description: |-
-                  Placement optionally records where the device is physically mounted in a
-                  Rack. A validating webhook enforces fit and non-overlap.
-                properties:
-                  face:
-                    default: Front
-                    description: Face is the rack face the device is mounted on. Defaults
-                      to Front.
-                    enum:
-                    - Front
-                    - Rear
-                    type: string
-                  rackRef:
-                    description: RackRef references the Rack this device is mounted
-                      in.
-                    properties:
-                      name:
-                        description: Name of the referenced object.
-                        minLength: 1
-                        type: string
-                    required:
-                    - name
-                    type: object
-                  startUnit:
-                    description: |-
-                      StartUnit is the lowest rack unit (U) the device occupies, counting from
-                      1 at the bottom of the rack.
-                    format: int32
-                    minimum: 1
-                    type: integer
-                  unitHeight:
-                    description: UnitHeight is the number of contiguous units the
-                      device occupies.
-                    format: int32
-                    minimum: 1
-                    type: integer
-                required:
-                - rackRef
-                - startUnit
-                - unitHeight
-                type: object
-              role:
-                description: Role classifies the device's function.
-                enum:
-                - BorderRouter
-                - Spine
-                - Leaf
-                - Firewall
+                  HeightU is the number of mountable rack units (U) the rack provides.
+                  Devices placed in the rack occupy unit positions 1..HeightU.
+                format: int32
+                minimum: 1
+                type: integer
+              name:
+                description: Name is a human-readable name for the rack (e.g. its
+                  asset label).
+                type: string
+              powerFeeds:
+                description: PowerFeeds enumerates the power feeds delivered to the
+                  rack.
+                items:
+                  description: RackPowerFeed describes a single power feed delivered
+                    to a Rack.
+                  properties:
+                    ampsRated:
+                      description: AmpsRated is the rated current of the feed in amperes.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                    name:
+                      description: Name identifies the feed (e.g. "A", "B").
+                      minLength: 1
+                      type: string
+                    phase:
+                      description: Phase is the electrical phase configuration of
+                        the feed.
+                      enum:
+                      - SinglePhase
+                      - ThreePhase
+                      type: string
+                    voltage:
+                      description: Voltage is the nominal feed voltage in volts.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                  required:
+                  - name
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              row:
+                description: Row is the free-form row identifier within the cage.
                 type: string
               siteRef:
                 description: |-
-                  SiteRef references the Site where the device physically lives. A
-                  validating webhook additionally requires that this Site matches the
-                  referenced Cluster's SiteRef. This field is immutable after creation.
+                  SiteRef references the Site this Rack physically lives in. This field is
+                  immutable after creation.
                 properties:
                   name:
                     description: Name of the referenced object.
@@ -142,13 +128,10 @@ spec:
                 - name
                 type: object
             required:
-            - clusterRef
-            - role
+            - heightU
             - siteRef
             type: object
             x-kubernetes-validations:
-            - message: clusterRef is immutable
-              rule: self.clusterRef == oldSelf.clusterRef
             - message: siteRef is immutable
               rule: self.siteRef == oldSelf.siteRef
           status:
@@ -159,11 +142,11 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: NetworkDeviceStatus defines the observed state of NetworkDevice.
+            description: RackStatus defines the observed state of Rack.
             properties:
               conditions:
                 description: |-
-                  Represents the observations of a network device's current state.
+                  Represents the observations of a rack's current state.
                   Known condition types are: "Ready".
                 items:
                   description: Condition contains details for one aspect of the current

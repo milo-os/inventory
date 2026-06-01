@@ -50,6 +50,13 @@ func deleteProvider(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, p))).To(Succeed())
 }
 
+// deleteRack deletes a Rack ignoring NotFound.
+func deleteRack(name string) {
+	rk := &inventoryv1alpha1.Rack{}
+	rk.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, rk))).To(Succeed())
+}
+
 // deleteCluster deletes a Cluster ignoring NotFound.
 func deleteCluster(name string) {
 	c := &inventoryv1alpha1.Cluster{}
@@ -106,6 +113,17 @@ func makeProvider(name string) *inventoryv1alpha1.Provider {
 		Spec: inventoryv1alpha1.ProviderSpec{
 			DisplayName: "Test Provider " + name,
 			Type:        inventoryv1alpha1.ProviderTypeColocation,
+		},
+	}
+}
+
+// makeRack returns a Rack referencing the given site with the given height.
+func makeRack(name, siteName string, heightU int32) *inventoryv1alpha1.Rack {
+	return &inventoryv1alpha1.Rack{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.RackSpec{
+			SiteRef: inventoryv1alpha1.LocalObjectReference{Name: siteName},
+			HeightU: heightU,
 		},
 	}
 }

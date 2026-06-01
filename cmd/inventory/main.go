@@ -112,6 +112,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Site")
 		os.Exit(1)
 	}
+	if err := (&inventorycontroller.RackReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Rack")
+		os.Exit(1)
+	}
 	if err := (&inventorycontroller.ClusterReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -151,6 +158,10 @@ func main() {
 	}
 	if err := webhookv1alpha1.SetupSiteWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Site")
+		os.Exit(1)
+	}
+	if err := webhookv1alpha1.SetupRackWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Rack")
 		os.Exit(1)
 	}
 	if err := webhookv1alpha1.SetupClusterWebhookWithManager(mgr); err != nil {

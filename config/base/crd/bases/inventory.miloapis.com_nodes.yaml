@@ -172,6 +172,48 @@ spec:
                 - cpuCores
                 - memoryBytes
                 type: object
+              placement:
+                description: |-
+                  Placement optionally records where the Node is physically mounted in a
+                  Rack. A validating webhook enforces fit and non-overlap.
+                properties:
+                  face:
+                    default: Front
+                    description: Face is the rack face the device is mounted on. Defaults
+                      to Front.
+                    enum:
+                    - Front
+                    - Rear
+                    type: string
+                  rackRef:
+                    description: RackRef references the Rack this device is mounted
+                      in.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        minLength: 1
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  startUnit:
+                    description: |-
+                      StartUnit is the lowest rack unit (U) the device occupies, counting from
+                      1 at the bottom of the rack.
+                    format: int32
+                    minimum: 1
+                    type: integer
+                  unitHeight:
+                    description: UnitHeight is the number of contiguous units the
+                      device occupies.
+                    format: int32
+                    minimum: 1
+                    type: integer
+                required:
+                - rackRef
+                - startUnit
+                - unitHeight
+                type: object
               siteRef:
                 description: |-
                   SiteRef references the Site where this Node physically lives. This

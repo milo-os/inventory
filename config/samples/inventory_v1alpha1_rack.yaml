@@ -1,0 +1,23 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Rack
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+  name: rack-sample
+spec:
+  siteRef:
+    name: site-sample
+  cage: C-07
+  row: R-12
+  name: A14
+  heightU: 42
+  powerFeeds:
+    - name: A
+      phase: ThreePhase
+      voltage: 415
+      ampsRated: 32
+    - name: B
+      phase: ThreePhase
+      voltage: 415
+      ampsRated: 32
