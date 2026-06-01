@@ -1,0 +1,21 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Circuit
+metadata:
+  name: ci-circuit-xc-01
+spec:
+  providerRef:
+    name: ci-provider-equinix
+  type: CrossConnect
+  circuitID: EQ-XC-00042
+  bandwidthMbps: 10000
+  aEnd:
+    kind: Site
+    name: ci-site-sfo1
+  zEnd:
+    kind: Site
+    name: ci-site-sjc2
+  serviceRef:
+    apiGroup: networking.miloapis.com
+    kind: Network
+    name: galactic-vpc-uplink
+    namespace: default

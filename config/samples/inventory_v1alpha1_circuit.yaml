@@ -1,0 +1,24 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Circuit
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+  name: circuit-sample
+spec:
+  providerRef:
+    name: provider-sample
+  type: ProviderCircuit
+  circuitID: EQ-CIRCUIT-00123
+  bandwidthMbps: 10000
+  aEnd:
+    kind: Site
+    name: site-sample
+  zEnd:
+    kind: Site
+    name: site-sample-remote
+  serviceRef:
+    apiGroup: networking.miloapis.com
+    kind: Network
+    name: galactic-vpc-uplink
+    namespace: default

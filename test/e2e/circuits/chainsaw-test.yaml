@@ -1,0 +1,89 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: circuits
+spec:
+  description: |
+    Exercises Circuits and the cross-group ObjectReference:
+    - A Circuit delivered by a Provider between two Site endpoints becomes
+      Ready with EndpointsResolved=True, and a cross-group serviceRef
+      round-trips through the API.
+    - The webhook rejects a Circuit whose Provider does not exist.
+    - The webhook rejects a Circuit whose Site endpoint does not exist.
+    - The Provider and Site delete-guards reject deletion while a Circuit
+      references them.
+
+  steps:
+    - name: setup-topology
+      description: Create Region + two Sites + Provider. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: create-circuit
+      description: A cross-connect Circuit between the two Sites becomes Ready.
+      try:
+        - create:
+            file: 02-circuit.yaml
+        - assert:
+            file: assertions/assert-circuit-ready.yaml
+
+    - name: reject-missing-provider
+      description: A Circuit referencing a non-existent Provider is rejected.
+      try:
+        - create:
+            file: test-data/missing-provider-circuit.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: reject-missing-site
+      description: A Circuit referencing a non-existent Site endpoint is rejected.
+      try:
+        - create:
+            file: test-data/missing-site-circuit.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: reject-referenced-provider-delete
+      description: Deleting the Provider while the Circuit references it is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Provider
+              name: ci-provider-equinix
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'Circuit(s)')): true
+
+    - name: reject-referenced-site-delete
+      description: Deleting an endpoint Site while the Circuit references it is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Site
+              name: ci-site-sfo1
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'Circuit(s) still reference it')): true
+
+    - name: cleanup-children
+      description: |
+        Delete the Circuit before chainsaw's automatic cleanup tries to remove
+        the Provider and Sites — their delete-guard webhooks would otherwise
+        reject the DELETE while the Circuit references them.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Circuit
+              name: ci-circuit-xc-01

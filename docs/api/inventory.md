@@ -10,6 +10,8 @@ Resource Types:
 
 - [Cable](#cable)
 
+- [Circuit](#circuit)
+
 - [Cluster](#cluster)
 
 - [Link](#link)
@@ -208,6 +210,397 @@ Known condition types are: "Ready", "EndpointsResolved".<br/>
 
 ### Cable.status.conditions[index]
 <sup><sup>[↩ Parent](#cablestatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+## Circuit
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+Circuit is the Schema for the circuits API. A Circuit records a network
+circuit — cross-connect, provider circuit, transit, or peering — delivered
+by a Provider between two endpoints, optionally linked to a platform
+service in another API group.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>Circuit</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#circuitspec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          CircuitSpec defines the desired state of Circuit.<br/>
+          <br/>
+            <i>Validations</i>:<li>self.providerRef == oldSelf.providerRef: providerRef is immutable</li>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#circuitstatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          CircuitStatus defines the observed state of Circuit.<br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.spec
+<sup><sup>[↩ Parent](#circuit)</sup></sup>
+
+
+
+CircuitSpec defines the desired state of Circuit.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#circuitspecaend">aEnd</a></b></td>
+        <td>object</td>
+        <td>
+          AEnd is the A-side termination of the Circuit.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#circuitspecproviderref">providerRef</a></b></td>
+        <td>object</td>
+        <td>
+          ProviderRef references the Provider that delivers this Circuit. This
+field is immutable after creation.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>enum</td>
+        <td>
+          Type classifies the Circuit.<br/>
+          <br/>
+            <i>Enum</i>: CrossConnect, ProviderCircuit, Transit, Peering<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#circuitspeczend">zEnd</a></b></td>
+        <td>object</td>
+        <td>
+          ZEnd is the Z-side termination of the Circuit.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>bandwidthMbps</b></td>
+        <td>integer</td>
+        <td>
+          BandwidthMbps is the Circuit's provisioned bandwidth in megabits per
+second.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>circuitID</b></td>
+        <td>string</td>
+        <td>
+          CircuitID is the provider's circuit / LOA identifier.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b><a href="#circuitspecserviceref">serviceRef</a></b></td>
+        <td>object</td>
+        <td>
+          ServiceRef optionally links this Circuit to a platform resource in
+another API group (e.g. a networking Galactic VPC uplink).<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.spec.aEnd
+<sup><sup>[↩ Parent](#circuitspec)</sup></sup>
+
+
+
+AEnd is the A-side termination of the Circuit.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>kind</b></td>
+        <td>enum</td>
+        <td>
+          Kind of the inventory object this end terminates on.<br/>
+          <br/>
+            <i>Enum</i>: Site, Port<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.spec.providerRef
+<sup><sup>[↩ Parent](#circuitspec)</sup></sup>
+
+
+
+ProviderRef references the Provider that delivers this Circuit. This
+field is immutable after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.spec.zEnd
+<sup><sup>[↩ Parent](#circuitspec)</sup></sup>
+
+
+
+ZEnd is the Z-side termination of the Circuit.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>kind</b></td>
+        <td>enum</td>
+        <td>
+          Kind of the inventory object this end terminates on.<br/>
+          <br/>
+            <i>Enum</i>: Site, Port<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.spec.serviceRef
+<sup><sup>[↩ Parent](#circuitspec)</sup></sup>
+
+
+
+ServiceRef optionally links this Circuit to a platform resource in
+another API group (e.g. a networking Galactic VPC uplink).
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>apiGroup</b></td>
+        <td>string</td>
+        <td>
+          APIGroup of the referenced resource (e.g. "networking.miloapis.com").<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>kind</b></td>
+        <td>string</td>
+        <td>
+          Kind of the referenced resource.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced resource.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>namespace</b></td>
+        <td>string</td>
+        <td>
+          Namespace of the referenced resource, for namespaced targets.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.status
+<sup><sup>[↩ Parent](#circuit)</sup></sup>
+
+
+
+CircuitStatus defines the observed state of Circuit.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#circuitstatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          Represents the observations of a circuit's current state.
+Known condition types are: "Ready", "EndpointsResolved".<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Circuit.status.conditions[index]
+<sup><sup>[↩ Parent](#circuitstatus)</sup></sup>
 
 
 

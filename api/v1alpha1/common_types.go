@@ -91,6 +91,36 @@ type PortDeviceReference struct {
 	Name string `json:"name"`
 }
 
+// ObjectReference is a typed reference to a resource in another Milo API
+// group. It is used to link inventory objects to platform resources outside
+// the inventory group (e.g. a Circuit to a networking Galactic VPC uplink).
+// AssetReference stays for intra-inventory links; ObjectReference is for
+// cross-group links and may carry a Namespace for namespaced targets.
+type ObjectReference struct {
+	// APIGroup of the referenced resource (e.g. "networking.miloapis.com").
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	APIGroup string `json:"apiGroup"`
+
+	// Kind of the referenced resource.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	Kind string `json:"kind"`
+
+	// Name of the referenced resource.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	Name string `json:"name"`
+
+	// Namespace of the referenced resource, for namespaced targets.
+	//
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+}
+
 // Coordinates describes a point on Earth using decimal degrees. Both latitude
 // and longitude must fall within their standard ranges.
 //

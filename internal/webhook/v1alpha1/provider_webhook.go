@@ -5,6 +5,7 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -41,14 +42,29 @@ func (v *ProviderValidator) ValidateDelete(ctx context.Context, provider *invent
 	if err := v.Client.List(ctx, &sites, client.MatchingFields{controller.IndexSiteProviderRef: provider.Name}); err != nil {
 		return nil, err
 	}
-	if len(sites.Items) > 0 {
-		names := childNames(sites.Items, func(s inventoryv1alpha1.Site) string { return s.Name })
-		return nil, apierrors.NewBadRequest(fmt.Sprintf(
-			"cannot delete Provider %s: %d Site(s) still reference it: %v%s",
-			provider.Name, len(sites.Items), names, truncationSuffix(len(sites.Items)),
-		))
+	var circuits inventoryv1alpha1.CircuitList
+	if err := v.Client.List(ctx, &circuits, client.MatchingFields{controller.IndexCircuitProviderRef: provider.Name}); err != nil {
+		return nil, err
 	}
-	return nil, nil
+
+	if len(sites.Items)+len(circuits.Items) == 0 {
+		return nil, nil
+	}
+
+	var parts []string
+	if n := len(sites.Items); n > 0 {
+		names := childNames(sites.Items, func(s inventoryv1alpha1.Site) string { return s.Name })
+		parts = append(parts, fmt.Sprintf("%d Site(s) still reference it: %v%s", n, names, truncationSuffix(n)))
+	}
+	if n := len(circuits.Items); n > 0 {
+		names := childNames(circuits.Items, func(c inventoryv1alpha1.Circuit) string { return c.Name })
+		parts = append(parts, fmt.Sprintf("%d Circuit(s) still reference it: %v%s", n, names, truncationSuffix(n)))
+	}
+
+	return nil, apierrors.NewBadRequest(fmt.Sprintf(
+		"cannot delete Provider %s: %s",
+		provider.Name, strings.Join(parts, "; "),
+	))
 }
 
 func SetupProviderWebhookWithManager(mgr ctrl.Manager) error {

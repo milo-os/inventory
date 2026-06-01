@@ -55,8 +55,12 @@ func (v *SiteValidator) ValidateDelete(ctx context.Context, site *inventoryv1alp
 	if err := v.Client.List(ctx, &devices, client.MatchingFields{controller.IndexNetworkDeviceSiteRef: site.Name}); err != nil {
 		return nil, err
 	}
+	var circuits inventoryv1alpha1.CircuitList
+	if err := v.Client.List(ctx, &circuits, client.MatchingFields{controller.IndexCircuitSiteEndpoint: site.Name}); err != nil {
+		return nil, err
+	}
 
-	total := len(nodes.Items) + len(clusters.Items) + len(devices.Items)
+	total := len(nodes.Items) + len(clusters.Items) + len(devices.Items) + len(circuits.Items)
 	if total == 0 {
 		return nil, nil
 	}
@@ -73,6 +77,10 @@ func (v *SiteValidator) ValidateDelete(ctx context.Context, site *inventoryv1alp
 	if n := len(devices.Items); n > 0 {
 		names := childNames(devices.Items, func(x inventoryv1alpha1.NetworkDevice) string { return x.Name })
 		parts = append(parts, fmt.Sprintf("%d NetworkDevice(s) still reference it: %v%s", n, names, truncationSuffix(n)))
+	}
+	if n := len(circuits.Items); n > 0 {
+		names := childNames(circuits.Items, func(x inventoryv1alpha1.Circuit) string { return x.Name })
+		parts = append(parts, fmt.Sprintf("%d Circuit(s) still reference it: %v%s", n, names, truncationSuffix(n)))
 	}
 
 	return nil, apierrors.NewBadRequest(fmt.Sprintf(

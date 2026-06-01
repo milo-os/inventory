@@ -1,0 +1,14 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Circuit
+metadata:
+  name: ci-circuit-bad-site
+spec:
+  providerRef:
+    name: ci-provider-equinix
+  type: Transit
+  aEnd:
+    kind: Site
+    name: ci-site-sfo1
+  zEnd:
+    kind: Site
+    name: ci-site-ghost
