@@ -67,6 +67,18 @@ patches:
     - op: replace
       path: /webhooks/7/clientConfig/service/namespace
       value: inventory-system
+    - op: replace
+      path: /webhooks/8/clientConfig/service/name
+      value: inventory-webhook
+    - op: replace
+      path: /webhooks/8/clientConfig/service/namespace
+      value: inventory-system
+    - op: replace
+      path: /webhooks/9/clientConfig/service/name
+      value: inventory-webhook
+    - op: replace
+      path: /webhooks/9/clientConfig/service/namespace
+      value: inventory-system
   target:
     kind: ValidatingWebhookConfiguration
     name: validating-webhook-configuration

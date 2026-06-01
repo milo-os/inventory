@@ -51,6 +51,13 @@ type LinkSpec struct {
 	//
 	// +optional
 	LatencyMs *resource.Quantity `json:"latencyMs,omitempty"`
+
+	// CableRefs optionally records the physical Cable(s) that realize this
+	// logical Link.
+	//
+	// +optional
+	// +listType=atomic
+	CableRefs []LocalObjectReference `json:"cableRefs,omitempty"`
 }
 
 // LinkStatus defines the observed state of Link.

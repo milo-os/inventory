@@ -1,0 +1,23 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Port
+metadata:
+  name: pc-port-a
+  labels:
+    topology.inventory.miloapis.com/site: pc-site-sfo1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Port
+metadata:
+  name: pc-port-z
+  labels:
+    topology.inventory.miloapis.com/site: pc-site-sfo1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

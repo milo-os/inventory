@@ -1,0 +1,11 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cable
+metadata:
+  name: pc-cable-01
+spec:
+  endpoints:
+    - name: pc-port-a
+    - name: pc-port-z
+  media: FiberSMF
+  lengthM: "2"
+  label: A14-A-01

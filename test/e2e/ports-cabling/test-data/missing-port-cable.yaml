@@ -1,0 +1,9 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Cable
+metadata:
+  name: pc-cable-bad
+spec:
+  endpoints:
+    - name: pc-port-a
+    - name: pc-port-ghost
+  media: FiberSMF

@@ -147,6 +147,20 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Link")
 		os.Exit(1)
 	}
+	if err := (&inventorycontroller.PortReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Port")
+		os.Exit(1)
+	}
+	if err := (&inventorycontroller.CableReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Cable")
+		os.Exit(1)
+	}
 
 	if err := webhookv1alpha1.SetupRegionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Region")
@@ -178,6 +192,14 @@ func main() {
 	}
 	if err := webhookv1alpha1.SetupLinkWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Link")
+		os.Exit(1)
+	}
+	if err := webhookv1alpha1.SetupPortWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Port")
+		os.Exit(1)
+	}
+	if err := webhookv1alpha1.SetupCableWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Cable")
 		os.Exit(1)
 	}
 

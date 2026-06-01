@@ -7,6 +7,8 @@ resources:
 - inventory_v1alpha1_cluster.yaml
 - inventory_v1alpha1_node.yaml
 - inventory_v1alpha1_networkdevice.yaml
+- inventory_v1alpha1_port.yaml
+- inventory_v1alpha1_cable.yaml
 - inventory_v1alpha1_link.yaml
 - inventory_v1alpha1_fleet.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples

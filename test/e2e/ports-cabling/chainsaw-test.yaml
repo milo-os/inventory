@@ -1,0 +1,84 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: ports-cabling
+spec:
+  description: |
+    Exercises Ports and Cables:
+    - Ports on a device become Ready and inherit the device's site topology
+      label.
+    - A Cable connecting two existing Ports becomes Ready with
+      EndpointsResolved=True.
+    - The webhook rejects a Cable whose endpoint Port does not exist.
+    - The Port delete-guard webhook rejects deletion while a Cable references
+      the Port.
+
+  steps:
+    - name: setup-topology
+      description: Create Region + Site + Node. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: create-ports
+      description: Two Ports on the Node become Ready with the site label.
+      try:
+        - create:
+            file: 02-ports.yaml
+        - assert:
+            file: assertions/assert-ports-ready.yaml
+
+    - name: create-cable
+      description: A Cable between the two Ports becomes Ready/EndpointsResolved.
+      try:
+        - create:
+            file: 03-cable.yaml
+        - assert:
+            file: assertions/assert-cable-ready.yaml
+
+    - name: reject-missing-port
+      description: A Cable referencing a non-existent Port is rejected.
+      try:
+        - create:
+            file: test-data/missing-port-cable.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: reject-cabled-port-delete
+      description: Deleting a Port while a Cable references it is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Port
+              name: pc-port-a
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'still reference it')): true
+
+    - name: cleanup-children
+      description: |
+        Remove the Cable and Ports before chainsaw's automatic cleanup tries
+        to delete the Node and Site — the Port and Site delete-guard webhooks
+        would otherwise reject the DELETE while children reference them.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Cable
+              name: pc-cable-01
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Port
+              name: pc-port-a
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Port
+              name: pc-port-z

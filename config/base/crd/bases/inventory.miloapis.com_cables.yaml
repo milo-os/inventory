@@ -4,37 +4,28 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.4
-  name: links.inventory.miloapis.com
+  name: cables.inventory.miloapis.com
 spec:
   group: inventory.miloapis.com
   names:
-    kind: Link
-    listKind: LinkList
-    plural: links
-    singular: link
+    kind: Cable
+    listKind: CableList
+    plural: cables
+    singular: cable
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.endpoints[0].kind
-      name: A-Kind
+    - jsonPath: .spec.media
+      name: Media
       type: string
     - jsonPath: .spec.endpoints[0].name
-      name: A-Name
-      type: string
-    - jsonPath: .spec.endpoints[1].kind
-      name: B-Kind
+      name: A
       type: string
     - jsonPath: .spec.endpoints[1].name
-      name: B-Name
+      name: Z
       type: string
-    - jsonPath: .spec.type
-      name: Type
-      type: string
-    - jsonPath: .spec.capacityMbps
-      name: Mbps
-      type: integer
-    - jsonPath: .spec.latencyMs
-      name: Latency
+    - jsonPath: .spec.lengthM
+      name: Length
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -49,8 +40,8 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          Link is the Schema for the links API. A Link records connectivity between
-          two inventory assets (Sites, Clusters, or NetworkDevices).
+          Cable is the Schema for the cables API. A Cable is the physical run between
+          two Ports.
         properties:
           apiVersion:
             description: |-
@@ -70,12 +61,16 @@ spec:
           metadata:
             type: object
           spec:
-            description: LinkSpec defines the desired state of Link.
+            description: |-
+              CableSpec defines the desired state of Cable. A Cable records the physical
+              run between exactly two Ports — the near-end and far-end. It is distinct
+              from the logical Link, which records connectivity/capacity between assets;
+              a Link may reference the Cable(s) that realize it.
             properties:
-              cableRefs:
+              endpoints:
                 description: |-
-                  CableRefs optionally records the physical Cable(s) that realize this
-                  logical Link.
+                  Endpoints are the two Ports this Cable connects. The two endpoints must
+                  reference different Ports.
                 items:
                   description: |-
                     LocalObjectReference is a reference to another cluster-scoped object in the
@@ -90,69 +85,39 @@ spec:
                   required:
                   - name
                   type: object
-                type: array
-                x-kubernetes-list-type: atomic
-              capacityMbps:
-                description: CapacityMbps is the Link's nominal capacity in megabits
-                  per second.
-                format: int64
-                minimum: 1
-                type: integer
-              endpoints:
-                description: |-
-                  Endpoints are the two assets this Link connects. The two endpoints
-                  must refer to different assets.
-                items:
-                  description: |-
-                    AssetReference is a typed reference to an inventory asset used as a Link
-                    endpoint. The Kind is restricted to the subset of inventory kinds that can
-                    participate in a Link.
-                  properties:
-                    kind:
-                      description: |-
-                        Kind of the referenced asset. Only a fixed set of inventory kinds may be
-                        referenced as a Link endpoint.
-                      enum:
-                      - Site
-                      - Cluster
-                      - NetworkDevice
-                      type: string
-                    name:
-                      description: Name of the referenced asset.
-                      minLength: 1
-                      type: string
-                  required:
-                  - kind
-                  - name
-                  type: object
                 maxItems: 2
                 minItems: 2
                 type: array
                 x-kubernetes-list-type: atomic
-              latencyMs:
+              label:
+                description: Label is a free-form operator label for the run (e.g.
+                  its sticker).
+                type: string
+              lengthM:
                 anyOf:
                 - type: integer
                 - type: string
                 description: |-
-                  LatencyMs is the Link's nominal one-way latency in milliseconds,
-                  expressed as a dimensionless Kubernetes Quantity (e.g. "5", "250m"
-                  for 0.25 ms). The field name encodes the unit; values are numeric.
+                  LengthM is the cable length in meters, expressed as a Kubernetes
+                  Quantity (e.g. "3", "0.5").
                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                 x-kubernetes-int-or-string: true
-              type:
-                description: Type classifies the Link.
+              media:
+                description: Media classifies the physical medium.
                 enum:
-                - Physical
-                - Logical
-                - Internet
+                - Copper
+                - FiberSMF
+                - FiberMMF
+                - Power
+                - DAC
                 type: string
             required:
             - endpoints
-            - type
+            - media
             type: object
             x-kubernetes-validations:
-            - message: link endpoints must be distinct
-              rule: self.endpoints[0] != self.endpoints[1]
+            - message: cable endpoints must be distinct
+              rule: self.endpoints[0].name != self.endpoints[1].name
           status:
             default:
               conditions:
@@ -161,11 +126,11 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: LinkStatus defines the observed state of Link.
+            description: CableStatus defines the observed state of Cable.
             properties:
               conditions:
                 description: |-
-                  Represents the observations of a link's current state.
+                  Represents the observations of a cable's current state.
                   Known condition types are: "Ready", "EndpointsResolved".
                 items:
                   description: Condition contains details for one aspect of the current

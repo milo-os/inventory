@@ -9,6 +9,8 @@ resources:
 - bases/inventory.miloapis.com_clusters.yaml
 - bases/inventory.miloapis.com_nodes.yaml
 - bases/inventory.miloapis.com_networkdevices.yaml
+- bases/inventory.miloapis.com_ports.yaml
+- bases/inventory.miloapis.com_cables.yaml
 - bases/inventory.miloapis.com_links.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
