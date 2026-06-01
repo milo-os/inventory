@@ -1,0 +1,26 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: vm-site-sfo1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Provider
+metadata:
+  name: vm-provider-equinix
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: vm-node-01
+status:
+  conditions:
+    - type: Ready
+      status: "True"

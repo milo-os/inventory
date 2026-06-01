@@ -30,6 +30,8 @@ Resource Types:
 
 - [Site](#site)
 
+- [VirtualMachine](#virtualmachine)
+
 
 
 
@@ -3450,6 +3452,422 @@ Known condition types are: "Ready".<br/>
 
 ### Site.status.conditions[index]
 <sup><sup>[↩ Parent](#sitestatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+## VirtualMachine
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+VirtualMachine is the Schema for the virtualmachines API. A VirtualMachine
+runs on a host Node and records its compute allocation and optional
+provider/project association.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>VirtualMachine</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinespec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          VirtualMachineSpec defines the desired state of VirtualMachine. It models
+host assignment and allocation only; power state and health are explicit
+non-goals.<br/>
+          <br/>
+            <i>Validations</i>:<li>self.hostRef == oldSelf.hostRef: hostRef is immutable</li>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinestatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          VirtualMachineStatus defines the observed state of VirtualMachine.<br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec
+<sup><sup>[↩ Parent](#virtualmachine)</sup></sup>
+
+
+
+VirtualMachineSpec defines the desired state of VirtualMachine. It models
+host assignment and allocation only; power state and health are explicit
+non-goals.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#virtualmachinespecallocation">allocation</a></b></td>
+        <td>object</td>
+        <td>
+          Allocation describes the compute resources allocated to the VM.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinespechostref">hostRef</a></b></td>
+        <td>object</td>
+        <td>
+          HostRef references the Node this VM runs on. This field is immutable
+after creation.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinespecprojectref">projectRef</a></b></td>
+        <td>object</td>
+        <td>
+          ProjectRef optionally links this VM to a resourcemanager Project (or
+other platform resource) in another API group.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinespecproviderref">providerRef</a></b></td>
+        <td>object</td>
+        <td>
+          ProviderRef optionally references the Provider that owns this VM.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec.allocation
+<sup><sup>[↩ Parent](#virtualmachinespec)</sup></sup>
+
+
+
+Allocation describes the compute resources allocated to the VM.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>memoryBytes</b></td>
+        <td>integer</td>
+        <td>
+          MemoryBytes is the amount of RAM allocated, in bytes.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>vcpus</b></td>
+        <td>integer</td>
+        <td>
+          VCPUs is the number of virtual CPUs allocated.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#virtualmachinespecallocationdisksindex">disks</a></b></td>
+        <td>[]object</td>
+        <td>
+          Disks is the list of virtual disks allocated to the VM. The disk shape
+is shared with Node.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec.allocation.disks[index]
+<sup><sup>[↩ Parent](#virtualmachinespecallocation)</sup></sup>
+
+
+
+NodeDisk describes a single disk attached to a Node.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name identifies the disk (e.g. device name or asset label).<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>sizeBytes</b></td>
+        <td>integer</td>
+        <td>
+          SizeBytes is the total raw capacity of the disk in bytes.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>enum</td>
+        <td>
+          Type classifies the disk media.<br/>
+          <br/>
+            <i>Enum</i>: SSD, HDD, NVMe<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec.hostRef
+<sup><sup>[↩ Parent](#virtualmachinespec)</sup></sup>
+
+
+
+HostRef references the Node this VM runs on. This field is immutable
+after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec.projectRef
+<sup><sup>[↩ Parent](#virtualmachinespec)</sup></sup>
+
+
+
+ProjectRef optionally links this VM to a resourcemanager Project (or
+other platform resource) in another API group.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>apiGroup</b></td>
+        <td>string</td>
+        <td>
+          APIGroup of the referenced resource (e.g. "resourcemanager.miloapis.com").<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>kind</b></td>
+        <td>string</td>
+        <td>
+          Kind of the referenced resource.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced resource.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>namespace</b></td>
+        <td>string</td>
+        <td>
+          Namespace of the referenced resource, for namespaced targets.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.spec.providerRef
+<sup><sup>[↩ Parent](#virtualmachinespec)</sup></sup>
+
+
+
+ProviderRef optionally references the Provider that owns this VM.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.status
+<sup><sup>[↩ Parent](#virtualmachine)</sup></sup>
+
+
+
+VirtualMachineStatus defines the observed state of VirtualMachine.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#virtualmachinestatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          Represents the observations of a virtual machine's current state.
+Known condition types are: "Ready".<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### VirtualMachine.status.conditions[index]
+<sup><sup>[↩ Parent](#virtualmachinestatus)</sup></sup>
 
 
 

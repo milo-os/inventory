@@ -1,0 +1,20 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: vm-web-01
+spec:
+  hostRef:
+    name: vm-node-01
+  providerRef:
+    name: vm-provider-equinix
+  projectRef:
+    apiGroup: resourcemanager.miloapis.com
+    kind: Project
+    name: web-prod
+  allocation:
+    vcpus: 4
+    memoryBytes: 17179869184
+    disks:
+      - name: root
+        sizeBytes: 107374182400
+        type: SSD

@@ -1,0 +1,10 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: vm-bad-host
+spec:
+  hostRef:
+    name: vm-node-ghost
+  allocation:
+    vcpus: 2
+    memoryBytes: 8589934592

@@ -12,6 +12,7 @@ resources:
 - bases/inventory.miloapis.com_ports.yaml
 - bases/inventory.miloapis.com_cables.yaml
 - bases/inventory.miloapis.com_circuits.yaml
+- bases/inventory.miloapis.com_virtualmachines.yaml
 - bases/inventory.miloapis.com_links.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
