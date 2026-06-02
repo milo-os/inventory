@@ -1,0 +1,31 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: rp-region-uswest
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: rp-site-sfo1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Rack
+metadata:
+  name: rp-rack-a14
+  labels:
+    topology.inventory.miloapis.com/region: rp-region-uswest
+    topology.inventory.miloapis.com/site: rp-site-sfo1
+    topology.inventory.miloapis.com/site-type: Datacenter
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

@@ -1,0 +1,13 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: rp-node-01
+  labels:
+    topology.inventory.miloapis.com/site: rp-site-sfo1
+    topology.inventory.miloapis.com/rack: rp-rack-a14
+status:
+  phase: Unassigned
+  conditions:
+    - type: Ready
+      status: "True"
+      reason: Accepted

@@ -16,6 +16,17 @@ var topologyLabelKeys = []string{
 	inventoryv1alpha1.TopologySiteLabel,
 	inventoryv1alpha1.TopologySiteTypeLabel,
 	inventoryv1alpha1.TopologyClusterLabel,
+	inventoryv1alpha1.TopologyRackLabel,
+}
+
+// rackLabel returns the desired value for TopologyRackLabel given an optional
+// Placement. An empty string (no placement) tells ensureLabels to clear the
+// key.
+func rackLabel(placement *inventoryv1alpha1.Placement) string {
+	if placement == nil {
+		return ""
+	}
+	return placement.RackRef.Name
 }
 
 // ensureLabels reconciles the well-known topology labels on obj toward the

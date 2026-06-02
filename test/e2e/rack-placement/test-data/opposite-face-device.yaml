@@ -1,0 +1,17 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: rp-node-rear
+spec:
+  siteRef:
+    name: rp-site-sfo1
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: amd64
+    memoryBytes: 34359738368
+  placement:
+    rackRef:
+      name: rp-rack-a14
+    startUnit: 10
+    unitHeight: 2
+    face: Rear

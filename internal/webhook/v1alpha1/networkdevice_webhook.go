@@ -55,7 +55,7 @@ func (v *NetworkDeviceValidator) validate(ctx context.Context, device *inventory
 		return nil, err
 	}
 
-	return nil, nil
+	return nil, validatePlacement(ctx, v.Client, device.Spec.Placement, "NetworkDevice", device.Name)
 }
 
 // SetupNetworkDeviceWebhookWithManager registers the NetworkDeviceValidator

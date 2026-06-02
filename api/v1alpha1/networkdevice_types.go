@@ -50,6 +50,12 @@ type NetworkDeviceSpec struct {
 	//
 	// +optional
 	ManagementAddress string `json:"managementAddress,omitempty"`
+
+	// Placement optionally records where the device is physically mounted in a
+	// Rack. A validating webhook enforces fit and non-overlap.
+	//
+	// +optional
+	Placement *Placement `json:"placement,omitempty"`
 }
 
 // NetworkDeviceStatus defines the observed state of NetworkDevice.

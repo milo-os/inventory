@@ -5,6 +5,7 @@ resources:
 - bases/inventory.miloapis.com_regions.yaml
 - bases/inventory.miloapis.com_providers.yaml
 - bases/inventory.miloapis.com_sites.yaml
+- bases/inventory.miloapis.com_racks.yaml
 - bases/inventory.miloapis.com_clusters.yaml
 - bases/inventory.miloapis.com_nodes.yaml
 - bases/inventory.miloapis.com_networkdevices.yaml

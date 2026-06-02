@@ -44,6 +44,18 @@ const (
 	// indexed under this key.
 	IndexNodeAssignmentClusterRef = "spec.assignment.clusterRef.name"
 
+	// IndexRackSiteRef indexes Racks by .spec.siteRef.name.
+	IndexRackSiteRef = "spec.siteRef.name"
+
+	// IndexNodePlacementRackRef indexes Nodes by
+	// .spec.placement.rackRef.name. Nodes without a placement are not indexed.
+	IndexNodePlacementRackRef = "spec.placement.rackRef.name"
+
+	// IndexNetworkDevicePlacementRackRef indexes NetworkDevices by
+	// .spec.placement.rackRef.name. Devices without a placement are not
+	// indexed.
+	IndexNetworkDevicePlacementRackRef = "spec.placement.rackRef.name"
+
 	// IndexLinkEndpointName indexes Links by every endpoint name in
 	// .spec.endpoints[*].name. A single Link appears under up to two values
 	// (one per endpoint). Webhooks and controllers must additionally check
@@ -125,6 +137,36 @@ func SetupIndexers(ctx context.Context, mgr ctrl.Manager) error {
 		return []string{node.Spec.Assignment.ClusterRef.Name}
 	}); err != nil {
 		return fmt.Errorf("indexing Node.%s: %w", IndexNodeAssignmentClusterRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Rack{}, IndexRackSiteRef, func(obj client.Object) []string {
+		rack, ok := obj.(*inventoryv1alpha1.Rack)
+		if !ok || rack.Spec.SiteRef.Name == "" {
+			return nil
+		}
+		return []string{rack.Spec.SiteRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing Rack.%s: %w", IndexRackSiteRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Node{}, IndexNodePlacementRackRef, func(obj client.Object) []string {
+		node, ok := obj.(*inventoryv1alpha1.Node)
+		if !ok || node.Spec.Placement == nil || node.Spec.Placement.RackRef.Name == "" {
+			return nil
+		}
+		return []string{node.Spec.Placement.RackRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing Node.%s: %w", IndexNodePlacementRackRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.NetworkDevice{}, IndexNetworkDevicePlacementRackRef, func(obj client.Object) []string {
+		dev, ok := obj.(*inventoryv1alpha1.NetworkDevice)
+		if !ok || dev.Spec.Placement == nil || dev.Spec.Placement.RackRef.Name == "" {
+			return nil
+		}
+		return []string{dev.Spec.Placement.RackRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing NetworkDevice.%s: %w", IndexNetworkDevicePlacementRackRef, err)
 	}
 
 	if err := idx.IndexField(ctx, &inventoryv1alpha1.Link{}, IndexLinkEndpointName, func(obj client.Object) []string {

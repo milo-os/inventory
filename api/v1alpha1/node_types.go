@@ -172,6 +172,12 @@ type NodeSpec struct {
 	//
 	// +optional
 	Assignment *NodeAssignment `json:"assignment,omitempty"`
+
+	// Placement optionally records where the Node is physically mounted in a
+	// Rack. A validating webhook enforces fit and non-overlap.
+	//
+	// +optional
+	Placement *Placement `json:"placement,omitempty"`
 }
 
 // NodeStatus defines the observed state of Node.

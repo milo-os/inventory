@@ -32,6 +32,48 @@ type AssetReference struct {
 	Name string `json:"name"`
 }
 
+// RackFace identifies which side of a rack a device is mounted on.
+//
+// +kubebuilder:validation:Enum=Front;Rear
+type RackFace string
+
+const (
+	// RackFaceFront is the front (cold-aisle) face of a rack.
+	RackFaceFront RackFace = "Front"
+	// RackFaceRear is the rear (hot-aisle) face of a rack.
+	RackFaceRear RackFace = "Rear"
+)
+
+// Placement records where a device is physically mounted within a Rack. The
+// device occupies the contiguous unit range [StartUnit, StartUnit+UnitHeight-1]
+// on the given Face. A validating webhook enforces that the range fits within
+// the Rack's HeightU and does not overlap another device on the same face.
+type Placement struct {
+	// RackRef references the Rack this device is mounted in.
+	//
+	// +kubebuilder:validation:Required
+	RackRef LocalObjectReference `json:"rackRef"`
+
+	// StartUnit is the lowest rack unit (U) the device occupies, counting from
+	// 1 at the bottom of the rack.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Minimum=1
+	StartUnit int32 `json:"startUnit"`
+
+	// UnitHeight is the number of contiguous units the device occupies.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Minimum=1
+	UnitHeight int32 `json:"unitHeight"`
+
+	// Face is the rack face the device is mounted on. Defaults to Front.
+	//
+	// +optional
+	// +kubebuilder:default=Front
+	Face RackFace `json:"face,omitempty"`
+}
+
 // Coordinates describes a point on Earth using decimal degrees. Both latitude
 // and longitude must fall within their standard ranges.
 //
@@ -64,6 +106,9 @@ const (
 
 	// TopologyClusterLabel names the Cluster an asset is assigned to, if any.
 	TopologyClusterLabel = "topology.inventory.miloapis.com/cluster"
+
+	// TopologyRackLabel names the Rack a device is placed in, if any.
+	TopologyRackLabel = "topology.inventory.miloapis.com/rack"
 )
 
 // FinalizerPrefix is prepended to per-kind finalizer names. v0.1 does not use

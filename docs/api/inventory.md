@@ -16,6 +16,10 @@ Resource Types:
 
 - [Node](#node)
 
+- [Provider](#provider)
+
+- [Rack](#rack)
+
 - [Region](#region)
 
 - [Site](#site)
@@ -651,6 +655,14 @@ referenced Cluster's SiteRef. This field is immutable after creation.<br/>
 the device's management plane. The inventory does not connect to it.<br/>
         </td>
         <td>false</td>
+      </tr><tr>
+        <td><b><a href="#networkdevicespecplacement">placement</a></b></td>
+        <td>object</td>
+        <td>
+          Placement optionally records where the device is physically mounted in a
+Rack. A validating webhook enforces fit and non-overlap.<br/>
+        </td>
+        <td>false</td>
       </tr></tbody>
 </table>
 
@@ -691,6 +703,92 @@ is immutable after creation.
 SiteRef references the Site where the device physically lives. A
 validating webhook additionally requires that this Site matches the
 referenced Cluster's SiteRef. This field is immutable after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### NetworkDevice.spec.placement
+<sup><sup>[↩ Parent](#networkdevicespec)</sup></sup>
+
+
+
+Placement optionally records where the device is physically mounted in a
+Rack. A validating webhook enforces fit and non-overlap.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#networkdevicespecplacementrackref">rackRef</a></b></td>
+        <td>object</td>
+        <td>
+          RackRef references the Rack this device is mounted in.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>startUnit</b></td>
+        <td>integer</td>
+        <td>
+          StartUnit is the lowest rack unit (U) the device occupies, counting from
+1 at the bottom of the rack.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>unitHeight</b></td>
+        <td>integer</td>
+        <td>
+          UnitHeight is the number of contiguous units the device occupies.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>face</b></td>
+        <td>enum</td>
+        <td>
+          Face is the rack face the device is mounted on. Defaults to Front.<br/>
+          <br/>
+            <i>Enum</i>: Front, Rear<br/>
+            <i>Default</i>: Front<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### NetworkDevice.spec.placement.rackRef
+<sup><sup>[↩ Parent](#networkdevicespecplacement)</sup></sup>
+
+
+
+RackRef references the Rack this device is mounted in.
 
 <table>
     <thead>
@@ -920,6 +1018,14 @@ field is immutable after creation.<br/>
         <td>
           Assignment optionally records the Cluster this Node is a member of.
 When unset the Node is considered unassigned.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b><a href="#nodespecplacement">placement</a></b></td>
+        <td>object</td>
+        <td>
+          Placement optionally records where the Node is physically mounted in a
+Rack. A validating webhook enforces fit and non-overlap.<br/>
         </td>
         <td>false</td>
       </tr></tbody>
@@ -1156,6 +1262,92 @@ ClusterRef references the Cluster the Node is assigned to.
 </table>
 
 
+### Node.spec.placement
+<sup><sup>[↩ Parent](#nodespec)</sup></sup>
+
+
+
+Placement optionally records where the Node is physically mounted in a
+Rack. A validating webhook enforces fit and non-overlap.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#nodespecplacementrackref">rackRef</a></b></td>
+        <td>object</td>
+        <td>
+          RackRef references the Rack this device is mounted in.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>startUnit</b></td>
+        <td>integer</td>
+        <td>
+          StartUnit is the lowest rack unit (U) the device occupies, counting from
+1 at the bottom of the rack.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>unitHeight</b></td>
+        <td>integer</td>
+        <td>
+          UnitHeight is the number of contiguous units the device occupies.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>face</b></td>
+        <td>enum</td>
+        <td>
+          Face is the rack face the device is mounted on. Defaults to Front.<br/>
+          <br/>
+            <i>Enum</i>: Front, Rear<br/>
+            <i>Default</i>: Front<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Node.spec.placement.rackRef
+<sup><sup>[↩ Parent](#nodespecplacement)</sup></sup>
+
+
+
+RackRef references the Rack this device is mounted in.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
 ### Node.status
 <sup><sup>[↩ Parent](#node)</sup></sup>
 
@@ -1196,6 +1388,613 @@ assignment and readiness.<br/>
 
 ### Node.status.conditions[index]
 <sup><sup>[↩ Parent](#nodestatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+## Provider
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>Provider</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#providerspec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          <br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#providerstatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          <br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Provider.spec
+<sup><sup>[↩ Parent](#provider)</sup></sup>
+
+
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>displayName</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>enum</td>
+        <td>
+          <br/>
+          <br/>
+            <i>Enum</i>: Hosting, Colocation, Transit, InternetExchange, DarkFiber, Cloud<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#providerspeccontract">contract</a></b></td>
+        <td>object</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b><a href="#providerspecserviceidentifiersindex">serviceIdentifiers</a></b></td>
+        <td>[]object</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Provider.spec.contract
+<sup><sup>[↩ Parent](#providerspec)</sup></sup>
+
+
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>accountID</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>contractID</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>notes</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>portalURL</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Provider.spec.serviceIdentifiers[index]
+<sup><sup>[↩ Parent](#providerspec)</sup></sup>
+
+
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>identifier</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          <br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Provider.status
+<sup><sup>[↩ Parent](#provider)</sup></sup>
+
+
+
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#providerstatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          <br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Provider.status.conditions[index]
+<sup><sup>[↩ Parent](#providerstatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+## Rack
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+Rack is the Schema for the racks API. A Rack belongs to exactly one Site and
+is the mount point for placed Nodes and NetworkDevices.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>Rack</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#rackspec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          RackSpec defines the desired state of Rack. Cage and row are modeled as
+free-form attributes rather than their own kinds to avoid kind explosion.<br/>
+          <br/>
+            <i>Validations</i>:<li>self.siteRef == oldSelf.siteRef: siteRef is immutable</li>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#rackstatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          RackStatus defines the observed state of Rack.<br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Rack.spec
+<sup><sup>[↩ Parent](#rack)</sup></sup>
+
+
+
+RackSpec defines the desired state of Rack. Cage and row are modeled as
+free-form attributes rather than their own kinds to avoid kind explosion.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>heightU</b></td>
+        <td>integer</td>
+        <td>
+          HeightU is the number of mountable rack units (U) the rack provides.
+Devices placed in the rack occupy unit positions 1..HeightU.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#rackspecsiteref">siteRef</a></b></td>
+        <td>object</td>
+        <td>
+          SiteRef references the Site this Rack physically lives in. This field is
+immutable after creation.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>cage</b></td>
+        <td>string</td>
+        <td>
+          Cage is the free-form cage identifier within the Site.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name is a human-readable name for the rack (e.g. its asset label).<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b><a href="#rackspecpowerfeedsindex">powerFeeds</a></b></td>
+        <td>[]object</td>
+        <td>
+          PowerFeeds enumerates the power feeds delivered to the rack.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>row</b></td>
+        <td>string</td>
+        <td>
+          Row is the free-form row identifier within the cage.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Rack.spec.siteRef
+<sup><sup>[↩ Parent](#rackspec)</sup></sup>
+
+
+
+SiteRef references the Site this Rack physically lives in. This field is
+immutable after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Rack.spec.powerFeeds[index]
+<sup><sup>[↩ Parent](#rackspec)</sup></sup>
+
+
+
+RackPowerFeed describes a single power feed delivered to a Rack.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name identifies the feed (e.g. "A", "B").<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>ampsRated</b></td>
+        <td>integer</td>
+        <td>
+          AmpsRated is the rated current of the feed in amperes.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>phase</b></td>
+        <td>enum</td>
+        <td>
+          Phase is the electrical phase configuration of the feed.<br/>
+          <br/>
+            <i>Enum</i>: SinglePhase, ThreePhase<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>voltage</b></td>
+        <td>integer</td>
+        <td>
+          Voltage is the nominal feed voltage in volts.<br/>
+          <br/>
+            <i>Format</i>: int32<br/>
+            <i>Minimum</i>: 1<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Rack.status
+<sup><sup>[↩ Parent](#rack)</sup></sup>
+
+
+
+RackStatus defines the observed state of Rack.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#rackstatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          Represents the observations of a rack's current state.
+Known condition types are: "Ready".<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Rack.status.conditions[index]
+<sup><sup>[↩ Parent](#rackstatus)</sup></sup>
 
 
 
@@ -1609,6 +2408,16 @@ immutable after creation.<br/>
           Address is an optional free-form postal/street address for the site.<br/>
         </td>
         <td>false</td>
+      </tr><tr>
+        <td><b><a href="#sitespecproviderref">providerRef</a></b></td>
+        <td>object</td>
+        <td>
+          LocalObjectReference is a reference to another cluster-scoped object in the
+inventory.miloapis.com API group by name. All inventory cross-resource
+references use this type rather than raw strings so that CRD schemas are
+explicit about intent.<br/>
+        </td>
+        <td>false</td>
       </tr></tbody>
 </table>
 
@@ -1620,6 +2429,36 @@ immutable after creation.<br/>
 
 RegionRef references the Region this Site belongs to. This field is
 immutable after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Site.spec.providerRef
+<sup><sup>[↩ Parent](#sitespec)</sup></sup>
+
+
+
+LocalObjectReference is a reference to another cluster-scoped object in the
+inventory.miloapis.com API group by name. All inventory cross-resource
+references use this type rather than raw strings so that CRD schemas are
+explicit about intent.
 
 <table>
     <thead>

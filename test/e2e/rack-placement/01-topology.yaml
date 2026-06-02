@@ -1,0 +1,33 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: rp-region-uswest
+spec:
+  displayName: US West
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: rp-site-sfo1
+spec:
+  displayName: SFO1
+  regionRef:
+    name: rp-region-uswest
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Rack
+metadata:
+  name: rp-rack-a14
+spec:
+  siteRef:
+    name: rp-site-sfo1
+  cage: C-07
+  row: R-12
+  name: A14
+  heightU: 42
+  powerFeeds:
+    - name: A
+      phase: ThreePhase
+      voltage: 415
+      ampsRated: 32

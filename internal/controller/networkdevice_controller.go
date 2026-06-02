@@ -90,6 +90,7 @@ func (r *NetworkDeviceReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	// Propagate cluster labels. The cluster already carries the region +
 	// site + site-type it inherited from its Site.
 	want := clusterLabels(cluster)
+	want[inventoryv1alpha1.TopologyRackLabel] = rackLabel(device.Spec.Placement)
 
 	originalSpec := device.DeepCopy()
 	if ensureLabels(device, want) {

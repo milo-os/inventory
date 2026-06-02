@@ -1,0 +1,99 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: rack-placement
+spec:
+  description: |
+    Exercises Rack placement:
+    - A Rack reaches Ready=True with site topology labels propagated.
+    - A Node whose placement fits within the rack is admitted, becomes Ready,
+      and carries the rack topology label.
+    - The webhook rejects a placement referencing a non-existent Rack.
+    - The webhook rejects a placement that does not fit within heightU.
+    - The webhook rejects a placement that overlaps an existing device on the
+      same face.
+    - A device on the opposite face at the same units is admitted.
+    - The Rack delete-guard webhook rejects deletion while a device is placed.
+
+  steps:
+    - name: setup-topology
+      description: Create Region + Site + Rack. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: place-node
+      description: A Node mounted at U10-U11 (front) is admitted and labeled.
+      try:
+        - create:
+            file: 02-placed-node.yaml
+        - assert:
+            file: assertions/assert-placed.yaml
+
+    - name: reject-ghost-rack
+      description: A placement to a non-existent Rack is rejected.
+      try:
+        - create:
+            file: test-data/ghost-rack-node.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: reject-oversized
+      description: A placement that exceeds the rack height is rejected.
+      try:
+        - create:
+            file: test-data/oversized-node.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'does not fit')): true
+
+    - name: reject-overlap
+      description: A placement overlapping the U10-U11 front node is rejected.
+      try:
+        - create:
+            file: test-data/overlapping-node.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'overlaps')): true
+
+    - name: accept-opposite-face
+      description: A device at the same units on the rear face is admitted.
+      try:
+        - create:
+            file: test-data/opposite-face-device.yaml
+
+    - name: reject-occupied-rack-delete
+      description: Deleting the Rack while devices are placed is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Rack
+              name: rp-rack-a14
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'still placed in it')): true
+
+    - name: cleanup-children
+      description: |
+        Remove the placed Nodes before chainsaw's automatic cleanup tries to
+        delete the Rack and Site — both delete-guard webhooks would otherwise
+        reject the DELETE while children reference them.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: rp-node-01
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: rp-node-rear

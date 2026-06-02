@@ -98,6 +98,8 @@ func (r *NodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		phase = inventoryv1alpha1.NodePhaseUnassigned
 	}
 
+	want[inventoryv1alpha1.TopologyRackLabel] = rackLabel(node.Spec.Placement)
+
 	originalSpec := node.DeepCopy()
 	if ensureLabels(node, want) {
 		if err := r.Patch(ctx, node, client.MergeFrom(originalSpec)); err != nil {
