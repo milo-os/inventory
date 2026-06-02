@@ -99,6 +99,13 @@ func deleteCable(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, c))).To(Succeed())
 }
 
+// deleteCircuit deletes a Circuit ignoring NotFound.
+func deleteCircuit(name string) {
+	c := &inventoryv1alpha1.Circuit{}
+	c.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, c))).To(Succeed())
+}
+
 // makeRegion returns a Region with the given name that is ready to Create.
 func makeRegion(name string) *inventoryv1alpha1.Region {
 	return &inventoryv1alpha1.Region{
@@ -206,6 +213,20 @@ func makeCable(name, portA, portB string, media inventoryv1alpha1.CableMedia) *i
 				{Name: portB},
 			},
 			Media: media,
+		},
+	}
+}
+
+// makeCircuit returns a Circuit delivered by the given Provider with both ends
+// terminating at the named Sites.
+func makeCircuit(name, providerName, siteA, siteZ string) *inventoryv1alpha1.Circuit {
+	return &inventoryv1alpha1.Circuit{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.CircuitSpec{
+			ProviderRef: inventoryv1alpha1.LocalObjectReference{Name: providerName},
+			Type:        inventoryv1alpha1.CircuitTypeProviderCircuit,
+			AEnd:        inventoryv1alpha1.CircuitEndpoint{Kind: inventoryv1alpha1.CircuitEndpointKindSite, Name: siteA},
+			ZEnd:        inventoryv1alpha1.CircuitEndpoint{Kind: inventoryv1alpha1.CircuitEndpointKindSite, Name: siteZ},
 		},
 	}
 }

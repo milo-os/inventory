@@ -73,6 +73,14 @@ const (
 	// IndexLinkCableRef indexes Links by every cable name in
 	// .spec.cableRefs[*].name.
 	IndexLinkCableRef = "spec.cableRefs.name"
+
+	// IndexCircuitProviderRef indexes Circuits by .spec.providerRef.name.
+	IndexCircuitProviderRef = "spec.providerRef.name"
+
+	// IndexCircuitSiteEndpoint indexes Circuits by the names of their Site-kind
+	// endpoints (aEnd/zEnd where kind == Site). Port-kind endpoints are not
+	// indexed here.
+	IndexCircuitSiteEndpoint = "spec.circuit.siteEndpoints.name"
 )
 
 // SetupIndexers registers every field indexer this package relies on
@@ -221,6 +229,32 @@ func SetupIndexers(ctx context.Context, mgr ctrl.Manager) error {
 		return names
 	}); err != nil {
 		return fmt.Errorf("indexing Link.%s: %w", IndexLinkCableRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Circuit{}, IndexCircuitProviderRef, func(obj client.Object) []string {
+		circuit, ok := obj.(*inventoryv1alpha1.Circuit)
+		if !ok || circuit.Spec.ProviderRef.Name == "" {
+			return nil
+		}
+		return []string{circuit.Spec.ProviderRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing Circuit.%s: %w", IndexCircuitProviderRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Circuit{}, IndexCircuitSiteEndpoint, func(obj client.Object) []string {
+		circuit, ok := obj.(*inventoryv1alpha1.Circuit)
+		if !ok {
+			return nil
+		}
+		var names []string
+		for _, ep := range []inventoryv1alpha1.CircuitEndpoint{circuit.Spec.AEnd, circuit.Spec.ZEnd} {
+			if ep.Kind == inventoryv1alpha1.CircuitEndpointKindSite && ep.Name != "" {
+				names = append(names, ep.Name)
+			}
+		}
+		return names
+	}); err != nil {
+		return fmt.Errorf("indexing Circuit.%s: %w", IndexCircuitSiteEndpoint, err)
 	}
 
 	if err := idx.IndexField(ctx, &inventoryv1alpha1.Link{}, IndexLinkEndpointName, func(obj client.Object) []string {

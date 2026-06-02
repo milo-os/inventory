@@ -1,0 +1,34 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: ci-region-uswest
+spec:
+  displayName: US West
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ci-site-sfo1
+spec:
+  displayName: SFO1
+  regionRef:
+    name: ci-region-uswest
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ci-site-sjc2
+spec:
+  displayName: SJC2
+  regionRef:
+    name: ci-region-uswest
+  type: Edge
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Provider
+metadata:
+  name: ci-provider-equinix
+spec:
+  displayName: Equinix
+  type: Colocation

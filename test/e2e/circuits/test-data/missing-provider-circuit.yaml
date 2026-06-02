@@ -1,0 +1,14 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Circuit
+metadata:
+  name: ci-circuit-bad-provider
+spec:
+  providerRef:
+    name: ci-provider-ghost
+  type: ProviderCircuit
+  aEnd:
+    kind: Site
+    name: ci-site-sfo1
+  zEnd:
+    kind: Site
+    name: ci-site-sjc2

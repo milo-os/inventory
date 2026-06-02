@@ -1,0 +1,26 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ci-site-sfo1
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: ci-site-sjc2
+status:
+  conditions:
+    - type: Ready
+      status: "True"
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Provider
+metadata:
+  name: ci-provider-equinix
+status:
+  conditions:
+    - type: Ready
+      status: "True"

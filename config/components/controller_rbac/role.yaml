@@ -8,6 +8,7 @@ rules:
   - inventory.miloapis.com
   resources:
   - cables
+  - circuits
   - clusters
   - links
   - networkdevices
@@ -25,6 +26,7 @@ rules:
   - inventory.miloapis.com
   resources:
   - cables/status
+  - circuits/status
   - clusters/status
   - links/status
   - networkdevices/status
