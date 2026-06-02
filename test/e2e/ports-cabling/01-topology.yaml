@@ -1,0 +1,28 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: pc-region-uswest
+spec:
+  displayName: US West
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: pc-site-sfo1
+spec:
+  displayName: SFO1
+  regionRef:
+    name: pc-region-uswest
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: pc-node-01
+spec:
+  siteRef:
+    name: pc-site-sfo1
+  hardware:
+    cpuCores: 8
+    cpuArchitecture: amd64
+    memoryBytes: 34359738368

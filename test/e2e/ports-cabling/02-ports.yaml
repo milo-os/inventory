@@ -1,0 +1,23 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Port
+metadata:
+  name: pc-port-a
+spec:
+  deviceRef:
+    kind: Node
+    name: pc-node-01
+  type: Optical
+  name: eth0
+  speed: 25G
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Port
+metadata:
+  name: pc-port-z
+spec:
+  deviceRef:
+    kind: Node
+    name: pc-node-01
+  type: Optical
+  name: eth1
+  speed: 25G

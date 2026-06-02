@@ -1,0 +1,14 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Port
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/managed-by: kustomize
+  name: port-sample
+spec:
+  deviceRef:
+    kind: NetworkDevice
+    name: networkdevice-sample
+  type: Optical
+  name: Ethernet1/1
+  speed: 100G

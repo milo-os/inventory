@@ -61,6 +61,18 @@ const (
 	// (one per endpoint). Webhooks and controllers must additionally check
 	// the endpoint Kind before treating a match as relevant.
 	IndexLinkEndpointName = "spec.endpoints.name"
+
+	// IndexPortDeviceRef indexes Ports by .spec.deviceRef.name. The index is
+	// kind-agnostic; consumers must additionally check deviceRef.kind.
+	IndexPortDeviceRef = "spec.deviceRef.name"
+
+	// IndexCableEndpointName indexes Cables by every endpoint Port name in
+	// .spec.endpoints[*].name. A single Cable appears under up to two values.
+	IndexCableEndpointName = "spec.cable.endpoints.name"
+
+	// IndexLinkCableRef indexes Links by every cable name in
+	// .spec.cableRefs[*].name.
+	IndexLinkCableRef = "spec.cableRefs.name"
 )
 
 // SetupIndexers registers every field indexer this package relies on
@@ -167,6 +179,48 @@ func SetupIndexers(ctx context.Context, mgr ctrl.Manager) error {
 		return []string{dev.Spec.Placement.RackRef.Name}
 	}); err != nil {
 		return fmt.Errorf("indexing NetworkDevice.%s: %w", IndexNetworkDevicePlacementRackRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Port{}, IndexPortDeviceRef, func(obj client.Object) []string {
+		port, ok := obj.(*inventoryv1alpha1.Port)
+		if !ok || port.Spec.DeviceRef.Name == "" {
+			return nil
+		}
+		return []string{port.Spec.DeviceRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing Port.%s: %w", IndexPortDeviceRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Cable{}, IndexCableEndpointName, func(obj client.Object) []string {
+		cable, ok := obj.(*inventoryv1alpha1.Cable)
+		if !ok || len(cable.Spec.Endpoints) == 0 {
+			return nil
+		}
+		names := make([]string, 0, len(cable.Spec.Endpoints))
+		for _, ep := range cable.Spec.Endpoints {
+			if ep.Name != "" {
+				names = append(names, ep.Name)
+			}
+		}
+		return names
+	}); err != nil {
+		return fmt.Errorf("indexing Cable.%s: %w", IndexCableEndpointName, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.Link{}, IndexLinkCableRef, func(obj client.Object) []string {
+		link, ok := obj.(*inventoryv1alpha1.Link)
+		if !ok || len(link.Spec.CableRefs) == 0 {
+			return nil
+		}
+		names := make([]string, 0, len(link.Spec.CableRefs))
+		for _, ref := range link.Spec.CableRefs {
+			if ref.Name != "" {
+				names = append(names, ref.Name)
+			}
+		}
+		return names
+	}); err != nil {
+		return fmt.Errorf("indexing Link.%s: %w", IndexLinkCableRef, err)
 	}
 
 	if err := idx.IndexField(ctx, &inventoryv1alpha1.Link{}, IndexLinkEndpointName, func(obj client.Object) []string {

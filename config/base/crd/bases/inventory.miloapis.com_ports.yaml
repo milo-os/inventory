@@ -4,37 +4,31 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.4
-  name: links.inventory.miloapis.com
+  name: ports.inventory.miloapis.com
 spec:
   group: inventory.miloapis.com
   names:
-    kind: Link
-    listKind: LinkList
-    plural: links
-    singular: link
+    kind: Port
+    listKind: PortList
+    plural: ports
+    singular: port
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.endpoints[0].kind
-      name: A-Kind
+    - jsonPath: .spec.deviceRef.kind
+      name: Device-Kind
       type: string
-    - jsonPath: .spec.endpoints[0].name
-      name: A-Name
-      type: string
-    - jsonPath: .spec.endpoints[1].kind
-      name: B-Kind
-      type: string
-    - jsonPath: .spec.endpoints[1].name
-      name: B-Name
+    - jsonPath: .spec.deviceRef.name
+      name: Device
       type: string
     - jsonPath: .spec.type
       name: Type
       type: string
-    - jsonPath: .spec.capacityMbps
-      name: Mbps
-      type: integer
-    - jsonPath: .spec.latencyMs
-      name: Latency
+    - jsonPath: .spec.name
+      name: Name
+      type: string
+    - jsonPath: .spec.speed
+      name: Speed
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -49,8 +43,9 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          Link is the Schema for the links API. A Link records connectivity between
-          two inventory assets (Sites, Clusters, or NetworkDevices).
+          Port is the Schema for the ports API. A Port is a connection point exposed
+          by a Node, NetworkDevice, or Rack-mounted device, and is the near/far-end
+          identifier a Cable connects.
         properties:
           apiVersion:
             description: |-
@@ -70,89 +65,60 @@ spec:
           metadata:
             type: object
           spec:
-            description: LinkSpec defines the desired state of Link.
+            description: PortSpec defines the desired state of Port.
             properties:
-              cableRefs:
+              deviceRef:
                 description: |-
-                  CableRefs optionally records the physical Cable(s) that realize this
-                  logical Link.
-                items:
-                  description: |-
-                    LocalObjectReference is a reference to another cluster-scoped object in the
-                    inventory.miloapis.com API group by name. All inventory cross-resource
-                    references use this type rather than raw strings so that CRD schemas are
-                    explicit about intent.
-                  properties:
-                    name:
-                      description: Name of the referenced object.
-                      minLength: 1
-                      type: string
-                  required:
-                  - name
-                  type: object
-                type: array
-                x-kubernetes-list-type: atomic
-              capacityMbps:
-                description: CapacityMbps is the Link's nominal capacity in megabits
-                  per second.
-                format: int64
-                minimum: 1
-                type: integer
-              endpoints:
+                  DeviceRef references the device that exposes this Port. This field is
+                  immutable after creation.
+                properties:
+                  kind:
+                    description: Kind of the device exposing the port.
+                    enum:
+                    - Node
+                    - NetworkDevice
+                    - Rack
+                    type: string
+                  name:
+                    description: Name of the referenced device.
+                    minLength: 1
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              name:
                 description: |-
-                  Endpoints are the two assets this Link connects. The two endpoints
-                  must refer to different assets.
-                items:
-                  description: |-
-                    AssetReference is a typed reference to an inventory asset used as a Link
-                    endpoint. The Kind is restricted to the subset of inventory kinds that can
-                    participate in a Link.
-                  properties:
-                    kind:
-                      description: |-
-                        Kind of the referenced asset. Only a fixed set of inventory kinds may be
-                        referenced as a Link endpoint.
-                      enum:
-                      - Site
-                      - Cluster
-                      - NetworkDevice
-                      type: string
-                    name:
-                      description: Name of the referenced asset.
-                      minLength: 1
-                      type: string
-                  required:
-                  - kind
-                  - name
-                  type: object
-                maxItems: 2
-                minItems: 2
-                type: array
-                x-kubernetes-list-type: atomic
-              latencyMs:
+                  Name identifies the Port on its device (e.g. "eth0", "PSU1",
+                  "pp-A-24").
+                minLength: 1
+                type: string
+              speed:
                 anyOf:
                 - type: integer
                 - type: string
                 description: |-
-                  LatencyMs is the Link's nominal one-way latency in milliseconds,
-                  expressed as a dimensionless Kubernetes Quantity (e.g. "5", "250m"
-                  for 0.25 ms). The field name encodes the unit; values are numeric.
+                  Speed is the nominal line rate of a network Port, expressed as a
+                  Kubernetes Quantity (e.g. "10G", "400G"). Unset for non-network ports.
                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                 x-kubernetes-int-or-string: true
               type:
-                description: Type classifies the Link.
+                description: Type classifies the Port.
                 enum:
-                - Physical
-                - Logical
-                - Internet
+                - Power
+                - Serial
+                - Ethernet
+                - Optical
+                - PatchPanel
                 type: string
             required:
-            - endpoints
+            - deviceRef
+            - name
             - type
             type: object
             x-kubernetes-validations:
-            - message: link endpoints must be distinct
-              rule: self.endpoints[0] != self.endpoints[1]
+            - message: deviceRef is immutable
+              rule: self.deviceRef == oldSelf.deviceRef
           status:
             default:
               conditions:
@@ -161,12 +127,12 @@ spec:
                 reason: Pending
                 status: "False"
                 type: Ready
-            description: LinkStatus defines the observed state of Link.
+            description: PortStatus defines the observed state of Port.
             properties:
               conditions:
                 description: |-
-                  Represents the observations of a link's current state.
-                  Known condition types are: "Ready", "EndpointsResolved".
+                  Represents the observations of a port's current state.
+                  Known condition types are: "Ready".
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.

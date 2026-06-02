@@ -74,6 +74,23 @@ type Placement struct {
 	Face RackFace `json:"face,omitempty"`
 }
 
+// PortDeviceReference is a typed reference to the device a Port belongs to.
+// The Kind is restricted to the inventory kinds that expose ports (hosts,
+// network devices, and rack-mounted PDUs / patch panels).
+type PortDeviceReference struct {
+	// Kind of the device exposing the port.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Enum=Node;NetworkDevice;Rack
+	Kind string `json:"kind"`
+
+	// Name of the referenced device.
+	//
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	Name string `json:"name"`
+}
+
 // Coordinates describes a point on Earth using decimal degrees. Both latitude
 // and longitude must fall within their standard ranges.
 //

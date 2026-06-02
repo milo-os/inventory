@@ -8,6 +8,8 @@ Packages:
 
 Resource Types:
 
+- [Cable](#cable)
+
 - [Cluster](#cluster)
 
 - [Link](#link)
@@ -15,6 +17,8 @@ Resource Types:
 - [NetworkDevice](#networkdevice)
 
 - [Node](#node)
+
+- [Port](#port)
 
 - [Provider](#provider)
 
@@ -26,6 +30,257 @@ Resource Types:
 
 
 
+
+## Cable
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+Cable is the Schema for the cables API. A Cable is the physical run between
+two Ports.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>Cable</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#cablespec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          CableSpec defines the desired state of Cable. A Cable records the physical
+run between exactly two Ports — the near-end and far-end. It is distinct
+from the logical Link, which records connectivity/capacity between assets;
+a Link may reference the Cable(s) that realize it.<br/>
+          <br/>
+            <i>Validations</i>:<li>self.endpoints[0].name != self.endpoints[1].name: cable endpoints must be distinct</li>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#cablestatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          CableStatus defines the observed state of Cable.<br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Cable.spec
+<sup><sup>[↩ Parent](#cable)</sup></sup>
+
+
+
+CableSpec defines the desired state of Cable. A Cable records the physical
+run between exactly two Ports — the near-end and far-end. It is distinct
+from the logical Link, which records connectivity/capacity between assets;
+a Link may reference the Cable(s) that realize it.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#cablespecendpointsindex">endpoints</a></b></td>
+        <td>[]object</td>
+        <td>
+          Endpoints are the two Ports this Cable connects. The two endpoints must
+reference different Ports.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>media</b></td>
+        <td>enum</td>
+        <td>
+          Media classifies the physical medium.<br/>
+          <br/>
+            <i>Enum</i>: Copper, FiberSMF, FiberMMF, Power, DAC<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>label</b></td>
+        <td>string</td>
+        <td>
+          Label is a free-form operator label for the run (e.g. its sticker).<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
+        <td><b>lengthM</b></td>
+        <td>int or string</td>
+        <td>
+          LengthM is the cable length in meters, expressed as a Kubernetes
+Quantity (e.g. "3", "0.5").<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Cable.spec.endpoints[index]
+<sup><sup>[↩ Parent](#cablespec)</sup></sup>
+
+
+
+LocalObjectReference is a reference to another cluster-scoped object in the
+inventory.miloapis.com API group by name. All inventory cross-resource
+references use this type rather than raw strings so that CRD schemas are
+explicit about intent.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Cable.status
+<sup><sup>[↩ Parent](#cable)</sup></sup>
+
+
+
+CableStatus defines the observed state of Cable.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#cablestatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          Represents the observations of a cable's current state.
+Known condition types are: "Ready", "EndpointsResolved".<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Cable.status.conditions[index]
+<sup><sup>[↩ Parent](#cablestatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
 
 ## Cluster
 <sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
@@ -380,6 +635,14 @@ must refer to different assets.<br/>
         </td>
         <td>true</td>
       </tr><tr>
+        <td><b><a href="#linkspeccablerefsindex">cableRefs</a></b></td>
+        <td>[]object</td>
+        <td>
+          CableRefs optionally records the physical Cable(s) that realize this
+logical Link.<br/>
+        </td>
+        <td>false</td>
+      </tr><tr>
         <td><b>capacityMbps</b></td>
         <td>integer</td>
         <td>
@@ -435,6 +698,36 @@ referenced as a Link endpoint.<br/>
         <td>string</td>
         <td>
           Name of the referenced asset.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Link.spec.cableRefs[index]
+<sup><sup>[↩ Parent](#linkspec)</sup></sup>
+
+
+
+LocalObjectReference is a reference to another cluster-scoped object in the
+inventory.miloapis.com API group by name. All inventory cross-resource
+references use this type rather than raw strings so that CRD schemas are
+explicit about intent.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced object.<br/>
         </td>
         <td>true</td>
       </tr></tbody>
@@ -1388,6 +1681,260 @@ assignment and readiness.<br/>
 
 ### Node.status.conditions[index]
 <sup><sup>[↩ Parent](#nodestatus)</sup></sup>
+
+
+
+Condition contains details for one aspect of the current state of this API Resource.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>lastTransitionTime</b></td>
+        <td>string</td>
+        <td>
+          lastTransitionTime is the last time the condition transitioned from one status to another.
+This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.<br/>
+          <br/>
+            <i>Format</i>: date-time<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>message</b></td>
+        <td>string</td>
+        <td>
+          message is a human readable message indicating details about the transition.
+This may be an empty string.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>reason</b></td>
+        <td>string</td>
+        <td>
+          reason contains a programmatic identifier indicating the reason for the condition's last transition.
+Producers of specific condition types may define expected values and meanings for this field,
+and whether the values are considered a guaranteed API.
+The value should be a CamelCase string.
+This field may not be empty.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>status</b></td>
+        <td>enum</td>
+        <td>
+          status of the condition, one of True, False, Unknown.<br/>
+          <br/>
+            <i>Enum</i>: True, False, Unknown<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>string</td>
+        <td>
+          type of condition in CamelCase or in foo.example.com/CamelCase.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>observedGeneration</b></td>
+        <td>integer</td>
+        <td>
+          observedGeneration represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.<br/>
+          <br/>
+            <i>Format</i>: int64<br/>
+            <i>Minimum</i>: 0<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+## Port
+<sup><sup>[↩ Parent](#inventorymiloapiscomv1alpha1 )</sup></sup>
+
+
+
+
+
+
+Port is the Schema for the ports API. A Port is a connection point exposed
+by a Node, NetworkDevice, or Rack-mounted device, and is the near/far-end
+identifier a Cable connects.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+      <td><b>apiVersion</b></td>
+      <td>string</td>
+      <td>inventory.miloapis.com/v1alpha1</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b>kind</b></td>
+      <td>string</td>
+      <td>Port</td>
+      <td>true</td>
+      </tr>
+      <tr>
+      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">metadata</a></b></td>
+      <td>object</td>
+      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
+      <td>true</td>
+      </tr><tr>
+        <td><b><a href="#portspec">spec</a></b></td>
+        <td>object</td>
+        <td>
+          PortSpec defines the desired state of Port.<br/>
+          <br/>
+            <i>Validations</i>:<li>self.deviceRef == oldSelf.deviceRef: deviceRef is immutable</li>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b><a href="#portstatus">status</a></b></td>
+        <td>object</td>
+        <td>
+          PortStatus defines the observed state of Port.<br/>
+          <br/>
+            <i>Default</i>: map[conditions:[map[lastTransitionTime:1970-01-01T00:00:00Z message:Waiting for reconciliation reason:Pending status:False type:Ready]]]<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Port.spec
+<sup><sup>[↩ Parent](#port)</sup></sup>
+
+
+
+PortSpec defines the desired state of Port.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#portspecdeviceref">deviceRef</a></b></td>
+        <td>object</td>
+        <td>
+          DeviceRef references the device that exposes this Port. This field is
+immutable after creation.<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name identifies the Port on its device (e.g. "eth0", "PSU1",
+"pp-A-24").<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>type</b></td>
+        <td>enum</td>
+        <td>
+          Type classifies the Port.<br/>
+          <br/>
+            <i>Enum</i>: Power, Serial, Ethernet, Optical, PatchPanel<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>speed</b></td>
+        <td>int or string</td>
+        <td>
+          Speed is the nominal line rate of a network Port, expressed as a
+Kubernetes Quantity (e.g. "10G", "400G"). Unset for non-network ports.<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Port.spec.deviceRef
+<sup><sup>[↩ Parent](#portspec)</sup></sup>
+
+
+
+DeviceRef references the device that exposes this Port. This field is
+immutable after creation.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b>kind</b></td>
+        <td>enum</td>
+        <td>
+          Kind of the device exposing the port.<br/>
+          <br/>
+            <i>Enum</i>: Node, NetworkDevice, Rack<br/>
+        </td>
+        <td>true</td>
+      </tr><tr>
+        <td><b>name</b></td>
+        <td>string</td>
+        <td>
+          Name of the referenced device.<br/>
+        </td>
+        <td>true</td>
+      </tr></tbody>
+</table>
+
+
+### Port.status
+<sup><sup>[↩ Parent](#port)</sup></sup>
+
+
+
+PortStatus defines the observed state of Port.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Required</th>
+        </tr>
+    </thead>
+    <tbody><tr>
+        <td><b><a href="#portstatusconditionsindex">conditions</a></b></td>
+        <td>[]object</td>
+        <td>
+          Represents the observations of a port's current state.
+Known condition types are: "Ready".<br/>
+        </td>
+        <td>false</td>
+      </tr></tbody>
+</table>
+
+
+### Port.status.conditions[index]
+<sup><sup>[↩ Parent](#portstatus)</sup></sup>
 
 
 

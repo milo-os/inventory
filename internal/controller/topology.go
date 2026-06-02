@@ -74,6 +74,18 @@ func ensureLabels(obj client.Object, want map[string]string) bool {
 	return changed
 }
 
+// copyTopologyLabels returns the well-known topology labels carried by the
+// given object. Keys the object lacks map to the empty string so that
+// ensureLabels clears any stale value on the inheriting object.
+func copyTopologyLabels(from client.Object) map[string]string {
+	src := from.GetLabels()
+	want := make(map[string]string, len(topologyLabelKeys))
+	for _, k := range topologyLabelKeys {
+		want[k] = src[k]
+	}
+	return want
+}
+
 // siteLabels returns the topology labels a child of the given Site should
 // carry. It composes from labels already on the Site (specifically the
 // region label, which the Site controller is responsible for propagating),

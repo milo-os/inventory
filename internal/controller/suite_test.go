@@ -119,6 +119,14 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr)).To(Succeed())
+	Expect((&inventorycontroller.PortReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)).To(Succeed())
+	Expect((&inventorycontroller.CableReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)).To(Succeed())
 
 	Expect(webhookv1alpha1.SetupRegionWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupProviderWebhookWithManager(mgr)).To(Succeed())
@@ -128,6 +136,8 @@ var _ = BeforeSuite(func() {
 	Expect(webhookv1alpha1.SetupNodeWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupNetworkDeviceWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupLinkWebhookWithManager(mgr)).To(Succeed())
+	Expect(webhookv1alpha1.SetupPortWebhookWithManager(mgr)).To(Succeed())
+	Expect(webhookv1alpha1.SetupCableWebhookWithManager(mgr)).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()

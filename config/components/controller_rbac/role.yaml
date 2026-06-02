@@ -7,10 +7,12 @@ rules:
 - apiGroups:
   - inventory.miloapis.com
   resources:
+  - cables
   - clusters
   - links
   - networkdevices
   - nodes
+  - ports
   - racks
   - sites
   verbs:
@@ -22,10 +24,12 @@ rules:
 - apiGroups:
   - inventory.miloapis.com
   resources:
+  - cables/status
   - clusters/status
   - links/status
   - networkdevices/status
   - nodes/status
+  - ports/status
   - providers/status
   - racks/status
   - regions/status

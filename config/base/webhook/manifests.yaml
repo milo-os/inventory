@@ -10,6 +10,27 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-cable
+  failurePolicy: Fail
+  name: vcable.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - cables
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
       path: /validate-inventory-miloapis-com-v1alpha1-cluster
   failurePolicy: Fail
   name: vcluster.inventory.miloapis.com
@@ -82,6 +103,25 @@ webhooks:
     - UPDATE
     resources:
     - nodes
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-inventory-miloapis-com-v1alpha1-port
+  failurePolicy: Fail
+  name: vport.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - inventory.miloapis.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - DELETE
+    resources:
+    - ports
   sideEffects: None
 - admissionReviewVersions:
   - v1

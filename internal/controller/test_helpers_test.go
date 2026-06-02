@@ -85,6 +85,20 @@ func deleteLink(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, l))).To(Succeed())
 }
 
+// deletePort deletes a Port ignoring NotFound.
+func deletePort(name string) {
+	p := &inventoryv1alpha1.Port{}
+	p.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, p))).To(Succeed())
+}
+
+// deleteCable deletes a Cable ignoring NotFound.
+func deleteCable(name string) {
+	c := &inventoryv1alpha1.Cable{}
+	c.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, c))).To(Succeed())
+}
+
 // makeRegion returns a Region with the given name that is ready to Create.
 func makeRegion(name string) *inventoryv1alpha1.Region {
 	return &inventoryv1alpha1.Region{
@@ -166,6 +180,32 @@ func makeNetworkDevice(name, siteName, clusterName string) *inventoryv1alpha1.Ne
 			ClusterRef: inventoryv1alpha1.LocalObjectReference{Name: clusterName},
 			SiteRef:    inventoryv1alpha1.LocalObjectReference{Name: siteName},
 			Role:       inventoryv1alpha1.NetworkDeviceRoleLeaf,
+		},
+	}
+}
+
+// makePort returns a Port on the given device.
+func makePort(name string, deviceKind, deviceName string, portType inventoryv1alpha1.PortType) *inventoryv1alpha1.Port {
+	return &inventoryv1alpha1.Port{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.PortSpec{
+			DeviceRef: inventoryv1alpha1.PortDeviceReference{Kind: deviceKind, Name: deviceName},
+			Type:      portType,
+			Name:      name,
+		},
+	}
+}
+
+// makeCable returns a Cable connecting the two named Ports.
+func makeCable(name, portA, portB string, media inventoryv1alpha1.CableMedia) *inventoryv1alpha1.Cable {
+	return &inventoryv1alpha1.Cable{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.CableSpec{
+			Endpoints: []inventoryv1alpha1.LocalObjectReference{
+				{Name: portA},
+				{Name: portB},
+			},
+			Media: media,
 		},
 	}
 }
