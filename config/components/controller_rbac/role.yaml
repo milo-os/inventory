@@ -16,6 +16,7 @@ rules:
   - ports
   - racks
   - sites
+  - virtualmachines
   verbs:
   - get
   - list
@@ -36,6 +37,7 @@ rules:
   - racks/status
   - regions/status
   - sites/status
+  - virtualmachines/status
   verbs:
   - get
   - patch

@@ -81,6 +81,13 @@ const (
 	// endpoints (aEnd/zEnd where kind == Site). Port-kind endpoints are not
 	// indexed here.
 	IndexCircuitSiteEndpoint = "spec.circuit.siteEndpoints.name"
+
+	// IndexVirtualMachineHostRef indexes VirtualMachines by .spec.hostRef.name.
+	IndexVirtualMachineHostRef = "spec.hostRef.name"
+
+	// IndexVirtualMachineProviderRef indexes VirtualMachines by
+	// .spec.providerRef.name. VMs without a provider are not indexed.
+	IndexVirtualMachineProviderRef = "spec.vm.providerRef.name"
 )
 
 // SetupIndexers registers every field indexer this package relies on
@@ -255,6 +262,26 @@ func SetupIndexers(ctx context.Context, mgr ctrl.Manager) error {
 		return names
 	}); err != nil {
 		return fmt.Errorf("indexing Circuit.%s: %w", IndexCircuitSiteEndpoint, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.VirtualMachine{}, IndexVirtualMachineHostRef, func(obj client.Object) []string {
+		vm, ok := obj.(*inventoryv1alpha1.VirtualMachine)
+		if !ok || vm.Spec.HostRef.Name == "" {
+			return nil
+		}
+		return []string{vm.Spec.HostRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing VirtualMachine.%s: %w", IndexVirtualMachineHostRef, err)
+	}
+
+	if err := idx.IndexField(ctx, &inventoryv1alpha1.VirtualMachine{}, IndexVirtualMachineProviderRef, func(obj client.Object) []string {
+		vm, ok := obj.(*inventoryv1alpha1.VirtualMachine)
+		if !ok || vm.Spec.ProviderRef == nil || vm.Spec.ProviderRef.Name == "" {
+			return nil
+		}
+		return []string{vm.Spec.ProviderRef.Name}
+	}); err != nil {
+		return fmt.Errorf("indexing VirtualMachine.%s: %w", IndexVirtualMachineProviderRef, err)
 	}
 
 	if err := idx.IndexField(ctx, &inventoryv1alpha1.Link{}, IndexLinkEndpointName, func(obj client.Object) []string {

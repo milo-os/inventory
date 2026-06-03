@@ -47,7 +47,12 @@ func (v *ProviderValidator) ValidateDelete(ctx context.Context, provider *invent
 		return nil, err
 	}
 
-	if len(sites.Items)+len(circuits.Items) == 0 {
+	var vms inventoryv1alpha1.VirtualMachineList
+	if err := v.Client.List(ctx, &vms, client.MatchingFields{controller.IndexVirtualMachineProviderRef: provider.Name}); err != nil {
+		return nil, err
+	}
+
+	if len(sites.Items)+len(circuits.Items)+len(vms.Items) == 0 {
 		return nil, nil
 	}
 
@@ -59,6 +64,10 @@ func (v *ProviderValidator) ValidateDelete(ctx context.Context, provider *invent
 	if n := len(circuits.Items); n > 0 {
 		names := childNames(circuits.Items, func(c inventoryv1alpha1.Circuit) string { return c.Name })
 		parts = append(parts, fmt.Sprintf("%d Circuit(s) still reference it: %v%s", n, names, truncationSuffix(n)))
+	}
+	if n := len(vms.Items); n > 0 {
+		names := childNames(vms.Items, func(x inventoryv1alpha1.VirtualMachine) string { return x.Name })
+		parts = append(parts, fmt.Sprintf("%d VirtualMachine(s) still reference it: %v%s", n, names, truncationSuffix(n)))
 	}
 
 	return nil, apierrors.NewBadRequest(fmt.Sprintf(

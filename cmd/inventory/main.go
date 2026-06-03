@@ -168,6 +168,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Circuit")
 		os.Exit(1)
 	}
+	if err := (&inventorycontroller.VirtualMachineReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "VirtualMachine")
+		os.Exit(1)
+	}
 
 	if err := webhookv1alpha1.SetupRegionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Region")
@@ -211,6 +218,10 @@ func main() {
 	}
 	if err := webhookv1alpha1.SetupCircuitWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Circuit")
+		os.Exit(1)
+	}
+	if err := webhookv1alpha1.SetupVirtualMachineWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "VirtualMachine")
 		os.Exit(1)
 	}
 

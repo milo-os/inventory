@@ -106,6 +106,13 @@ func deleteCircuit(name string) {
 	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, c))).To(Succeed())
 }
 
+// deleteVirtualMachine deletes a VirtualMachine ignoring NotFound.
+func deleteVirtualMachine(name string) {
+	vm := &inventoryv1alpha1.VirtualMachine{}
+	vm.Name = name
+	Expect(client.IgnoreNotFound(k8sClient.Delete(testCtx, vm))).To(Succeed())
+}
+
 // makeRegion returns a Region with the given name that is ready to Create.
 func makeRegion(name string) *inventoryv1alpha1.Region {
 	return &inventoryv1alpha1.Region{
@@ -227,6 +234,20 @@ func makeCircuit(name, providerName, siteA, siteZ string) *inventoryv1alpha1.Cir
 			Type:        inventoryv1alpha1.CircuitTypeProviderCircuit,
 			AEnd:        inventoryv1alpha1.CircuitEndpoint{Kind: inventoryv1alpha1.CircuitEndpointKindSite, Name: siteA},
 			ZEnd:        inventoryv1alpha1.CircuitEndpoint{Kind: inventoryv1alpha1.CircuitEndpointKindSite, Name: siteZ},
+		},
+	}
+}
+
+// makeVirtualMachine returns a VirtualMachine hosted on the given Node.
+func makeVirtualMachine(name, hostName string) *inventoryv1alpha1.VirtualMachine {
+	return &inventoryv1alpha1.VirtualMachine{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: inventoryv1alpha1.VirtualMachineSpec{
+			HostRef: inventoryv1alpha1.LocalObjectReference{Name: hostName},
+			Allocation: inventoryv1alpha1.VMAllocation{
+				VCPUs:       4,
+				MemoryBytes: 16 * 1024 * 1024 * 1024,
+			},
 		},
 	}
 }

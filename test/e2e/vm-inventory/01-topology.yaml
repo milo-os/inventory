@@ -1,0 +1,36 @@
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Region
+metadata:
+  name: vm-region-uswest
+spec:
+  displayName: US West
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Site
+metadata:
+  name: vm-site-sfo1
+spec:
+  displayName: SFO1
+  regionRef:
+    name: vm-region-uswest
+  type: Datacenter
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Provider
+metadata:
+  name: vm-provider-equinix
+spec:
+  displayName: Equinix
+  type: Cloud
+---
+apiVersion: inventory.miloapis.com/v1alpha1
+kind: Node
+metadata:
+  name: vm-node-01
+spec:
+  siteRef:
+    name: vm-site-sfo1
+  hardware:
+    cpuCores: 64
+    cpuArchitecture: amd64
+    memoryBytes: 274877906944

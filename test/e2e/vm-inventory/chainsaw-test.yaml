@@ -1,0 +1,77 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: vm-inventory
+spec:
+  description: |
+    Exercises VirtualMachine inventory:
+    - A VM hosted on a Node becomes Ready, inherits the host's site topology
+      label, and round-trips a cross-group projectRef.
+    - The webhook rejects a VM whose host Node does not exist.
+    - The Node delete-guard rejects deletion while a VM is hosted on it.
+    - The Provider delete-guard rejects deletion while a VM references it.
+
+  steps:
+    - name: setup-topology
+      description: Create Region + Site + Provider + Node. All become Ready.
+      try:
+        - create:
+            file: 01-topology.yaml
+        - assert:
+            file: assertions/assert-topology-ready.yaml
+
+    - name: create-vm
+      description: A VM on the Node becomes Ready with the site label.
+      try:
+        - create:
+            file: 02-vm.yaml
+        - assert:
+            file: assertions/assert-vm-ready.yaml
+
+    - name: reject-missing-host
+      description: A VM referencing a non-existent host Node is rejected.
+      try:
+        - create:
+            file: test-data/missing-host-vm.yaml
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'not found')): true
+
+    - name: reject-host-delete
+      description: Deleting the host Node while the VM runs on it is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Node
+              name: vm-node-01
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'VirtualMachine(s) still hosted on it')): true
+
+    - name: reject-provider-delete
+      description: Deleting the Provider while the VM references it is rejected.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: Provider
+              name: vm-provider-equinix
+            expect:
+              - check:
+                  ($error != null): true
+                  (contains($error, 'VirtualMachine(s) still reference it')): true
+
+    - name: cleanup-children
+      description: |
+        Delete the VM before chainsaw's automatic cleanup tries to remove the
+        Node, Provider, and Site — their delete-guard webhooks would otherwise
+        reject the DELETE while the VM references them.
+      try:
+        - delete:
+            ref:
+              apiVersion: inventory.miloapis.com/v1alpha1
+              kind: VirtualMachine
+              name: vm-web-01

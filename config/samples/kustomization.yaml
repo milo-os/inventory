@@ -10,6 +10,7 @@ resources:
 - inventory_v1alpha1_port.yaml
 - inventory_v1alpha1_cable.yaml
 - inventory_v1alpha1_circuit.yaml
+- inventory_v1alpha1_virtualmachine.yaml
 - inventory_v1alpha1_link.yaml
 - inventory_v1alpha1_fleet.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples
