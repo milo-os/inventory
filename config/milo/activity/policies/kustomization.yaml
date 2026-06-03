@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - region-policy.yaml
+  - provider-policy.yaml
+  - site-policy.yaml
+  - rack-policy.yaml
+  - cluster-policy.yaml
+  - node-policy.yaml
+  - networkdevice-policy.yaml
+  - link-policy.yaml
+  - port-policy.yaml
+  - cable-policy.yaml
+  - circuit-policy.yaml
+  - virtualmachine-policy.yaml

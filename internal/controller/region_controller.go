@@ -22,6 +22,9 @@ import (
 type RegionReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	// EventRecorder emits best-effort activity events on Ready transitions.
+	// May be nil (e.g. in unit tests), in which case emission is a no-op.
+	EventRecorder *EventRecorder
 }
 
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=regions,verbs=get;list;watch
@@ -48,6 +51,11 @@ func (r *RegionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		log.Error(err, "failed to patch Region status")
 		return ctrl.Result{}, err
 	}
+
+	r.EventRecorder.EmitReadyTransition(ctx, region,
+		inventoryv1alpha1.GroupVersion.WithKind("Region"),
+		displayNameOrName(region.Spec.DisplayName, region.Name),
+		original.Status.Conditions, region.Status.Conditions)
 
 	return ctrl.Result{}, nil
 }
