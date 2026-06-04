@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - inventory-viewer.yaml
+  - inventory-editor.yaml
+  - inventory-admin.yaml
+  - inventory-operator.yaml

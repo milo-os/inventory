@@ -73,6 +73,13 @@ simplest; `Site` shows an optional/validated ref). A complete kind touches:
    / `inventory-system` values, so just append one more index pair for the new
    webhook count.
 9. `config/samples/` — add a sample + list it in the samples kustomization.
+10. `config/base/iam/` — add a `ProtectedResource` for the kind
+    (`protected-resources/<singular>.yaml`, listed in its kustomization) and
+    extend the viewer/editor/operator `Role` permission lists with the kind's
+    `inventory.miloapis.com/<plural>.<verb>` strings. Without this, Milo IAM
+    grants no one access on the core control plane even though the CRD is
+    `Established` (see #39). This package is applied to Milo, not the local
+    cluster — it is not in `config/base`.
 
 Reference integrity split: parent kinds enforce **delete** guards (Region,
 Site, Cluster — reject DELETE while referenced, via the field indexers).

@@ -1,0 +1,18 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: ProtectedResource
+metadata:
+  name: inventory.miloapis.com-rack
+spec:
+  serviceRef:
+    name: "inventory.miloapis.com"
+  kind: Rack
+  plural: racks
+  singular: rack
+  permissions:
+    - list
+    - get
+    - create
+    - update
+    - delete
+    - patch
+    - watch

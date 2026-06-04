@@ -1,0 +1,230 @@
+# Example: grant a principal write access to inventory across the whole group.
+#
+# Inventory kinds are root, cluster-scoped resources with no parent, so a
+# PolicyBinding scopes via resourceSelector.resourceKind (platform-wide for
+# that kind). resourceKind selects a single kind, so writing the full group
+# means one binding per kind — the set below.
+#
+# Replace the subject with the real principal:
+#   - a human loader:  kind: User,           name/uid from the User resource
+#   - a loader SA:     kind: ServiceAccount, name/uid + namespace
+# Bind inventory.miloapis.com-editor (or -admin) for read/write.
+#
+# This file is an example and is intentionally NOT in kustomization.yaml:
+# subjects are environment-specific. Apply it (edited) on Milo, in milo-system.
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-region
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Region
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-provider
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Provider
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-site
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Site
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-rack
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Rack
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-cluster
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Cluster
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-node
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Node
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-networkdevice
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: NetworkDevice
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-port
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Port
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-cable
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Cable
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-circuit
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Circuit
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-virtualmachine
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: VirtualMachine
+---
+apiVersion: iam.miloapis.com/v1alpha1
+kind: PolicyBinding
+metadata:
+  name: inventory-loader-link
+  namespace: milo-system
+spec:
+  roleRef:
+    name: inventory.miloapis.com-editor
+    namespace: milo-system
+  subjects:
+    - kind: User
+      name: "evetere@datum.net"
+      uid: "REPLACE_WITH_USER_UID"
+  resourceSelector:
+    resourceKind:
+      apiGroup: "inventory.miloapis.com"
+      kind: Link
