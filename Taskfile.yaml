@@ -9,7 +9,10 @@ vars:
   CONTROLLER_TOOLS_VERSION: "v0.16.4"
   DEFAULTER_GEN_VERSION: "v0.32.3"
   GOLANGCI_LINT_VERSION: "v2.1.5"
-  CHAINSAW_VERSION: "v0.2.12"
+  # chainsaw is the e2e test runner only. Keep it on a release that compiles
+  # with the repo's Go toolchain — pre-0.2.15 versions fail under Go 1.26
+  # because their test runner predates testing.testDeps.ModulePath (see #36).
+  CHAINSAW_VERSION: "v0.2.15"
   CRDOC_VERSION: "v0.6.4"
   SETUP_ENVTEST_VERSION: "latest"
   # ENVTEST_K8S_VERSION controls which Kubernetes binaries (kube-apiserver,
@@ -42,7 +45,7 @@ tasks:
         {{.TOOL_DIR}}/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
         echo "Code generation complete!"
     deps:
-      - install-tools
+      - install:controller-gen
     silent: true
 
   manifests:
@@ -60,7 +63,7 @@ tasks:
           output:webhook:artifacts:config=config/base/webhook
         echo "Manifests generated!"
     deps:
-      - install-tools
+      - install:controller-gen
     silent: true
 
   api-docs:
@@ -73,7 +76,7 @@ tasks:
         {{.TOOL_DIR}}/crdoc --resources config/base/crd/bases --output docs/api/inventory.md
         echo "API docs generated!"
     deps:
-      - install-tools
+      - install:crdoc
     silent: true
 
   build:
@@ -106,7 +109,7 @@ tasks:
   test:
     desc: Run Go tests
     deps:
-      - install-tools
+      - install:setup-envtest
     cmds:
       - |
         set -e
@@ -119,72 +122,109 @@ tasks:
     cmds:
       - "{{.TOOL_DIR}}/golangci-lint run ./..."
     deps:
-      - install-tools
+      - install:golangci-lint
     silent: false
 
   # Tool installation
+  #
+  # Each tool installs independently with its own status guard, so a task only
+  # pulls in the tools it actually needs — e.g. `generate` depends on
+  # controller-gen, not chainsaw. This keeps a single tool's install failure
+  # (e.g. an e2e runner that won't compile under the current Go) from blocking
+  # unrelated codegen, lint, and unit-test tasks. See #36.
   install-tools:
-    desc: Install required development tools
+    desc: Install all development tools
+    deps:
+      - install:controller-gen
+      - install:defaulter-gen
+      - install:golangci-lint
+      - install:chainsaw
+      - install:crdoc
+      - install:setup-envtest
+
+  install:controller-gen:
+    desc: Install controller-gen (CRD/RBAC/webhook + deepcopy codegen)
+    silent: true
+    status:
+      - test -f {{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}}
     cmds:
       - |
         set -e
         mkdir -p {{.TOOL_DIR}}
-
-        # controller-gen
-        if [ ! -f "{{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}}" ]; then
-          echo "Installing controller-gen {{.CONTROLLER_TOOLS_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install sigs.k8s.io/controller-tools/cmd/controller-gen@{{.CONTROLLER_TOOLS_VERSION}}
-          mv {{.TOOL_DIR}}/controller-gen {{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}}
-        fi
+        echo "Installing controller-gen {{.CONTROLLER_TOOLS_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install sigs.k8s.io/controller-tools/cmd/controller-gen@{{.CONTROLLER_TOOLS_VERSION}}
+        mv {{.TOOL_DIR}}/controller-gen {{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}}
         ln -sf {{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}} {{.TOOL_DIR}}/controller-gen
 
-        # defaulter-gen
-        if [ ! -f "{{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}}" ]; then
-          echo "Installing defaulter-gen {{.DEFAULTER_GEN_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install k8s.io/code-generator/cmd/defaulter-gen@{{.DEFAULTER_GEN_VERSION}}
-          mv {{.TOOL_DIR}}/defaulter-gen {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}}
-        fi
-        ln -sf {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}} {{.TOOL_DIR}}/defaulter-gen
-
-        # golangci-lint
-        if [ ! -f "{{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}}" ]; then
-          echo "Installing golangci-lint {{.GOLANGCI_LINT_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
-          mv {{.TOOL_DIR}}/golangci-lint {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}}
-        fi
-        ln -sf {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}} {{.TOOL_DIR}}/golangci-lint
-
-        # chainsaw
-        if [ ! -f "{{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}}" ]; then
-          echo "Installing chainsaw {{.CHAINSAW_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install github.com/kyverno/chainsaw@{{.CHAINSAW_VERSION}}
-          mv {{.TOOL_DIR}}/chainsaw {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}}
-        fi
-        ln -sf {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}} {{.TOOL_DIR}}/chainsaw
-
-        # crdoc — renders CRDs into the API reference (docs/api)
-        if [ ! -f "{{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}" ]; then
-          echo "Installing crdoc {{.CRDOC_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install fybrik.io/crdoc@{{.CRDOC_VERSION}}
-          mv {{.TOOL_DIR}}/crdoc {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}
-        fi
-        ln -sf {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}} {{.TOOL_DIR}}/crdoc
-
-        # setup-envtest — downloads kube-apiserver/etcd binaries for envtest
-        # unit tests. Module is versioned loosely against controller-runtime
-        # so we pin to "latest" rather than a semver.
-        if [ ! -f "{{.TOOL_DIR}}/setup-envtest" ]; then
-          echo "Installing setup-envtest {{.SETUP_ENVTEST_VERSION}}..."
-          GOBIN={{.TOOL_DIR}} go install sigs.k8s.io/controller-runtime/tools/setup-envtest@{{.SETUP_ENVTEST_VERSION}}
-        fi
+  install:defaulter-gen:
+    desc: Install defaulter-gen
     silent: true
     status:
-      - test -f {{.TOOL_DIR}}/controller-gen-{{.CONTROLLER_TOOLS_VERSION}}
       - test -f {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}}
+    cmds:
+      - |
+        set -e
+        mkdir -p {{.TOOL_DIR}}
+        echo "Installing defaulter-gen {{.DEFAULTER_GEN_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install k8s.io/code-generator/cmd/defaulter-gen@{{.DEFAULTER_GEN_VERSION}}
+        mv {{.TOOL_DIR}}/defaulter-gen {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}}
+        ln -sf {{.TOOL_DIR}}/defaulter-gen-{{.DEFAULTER_GEN_VERSION}} {{.TOOL_DIR}}/defaulter-gen
+
+  install:golangci-lint:
+    desc: Install golangci-lint
+    silent: true
+    status:
       - test -f {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}}
+    cmds:
+      - |
+        set -e
+        mkdir -p {{.TOOL_DIR}}
+        echo "Installing golangci-lint {{.GOLANGCI_LINT_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
+        mv {{.TOOL_DIR}}/golangci-lint {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}}
+        ln -sf {{.TOOL_DIR}}/golangci-lint-{{.GOLANGCI_LINT_VERSION}} {{.TOOL_DIR}}/golangci-lint
+
+  install:chainsaw:
+    desc: Install chainsaw (e2e test runner)
+    silent: true
+    status:
       - test -f {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}}
+    cmds:
+      - |
+        set -e
+        mkdir -p {{.TOOL_DIR}}
+        echo "Installing chainsaw {{.CHAINSAW_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install github.com/kyverno/chainsaw@{{.CHAINSAW_VERSION}}
+        mv {{.TOOL_DIR}}/chainsaw {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}}
+        ln -sf {{.TOOL_DIR}}/chainsaw-{{.CHAINSAW_VERSION}} {{.TOOL_DIR}}/chainsaw
+
+  install:crdoc:
+    desc: Install crdoc (renders CRDs into the API reference)
+    silent: true
+    status:
       - test -f {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}
+    cmds:
+      - |
+        set -e
+        mkdir -p {{.TOOL_DIR}}
+        echo "Installing crdoc {{.CRDOC_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install fybrik.io/crdoc@{{.CRDOC_VERSION}}
+        mv {{.TOOL_DIR}}/crdoc {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}}
+        ln -sf {{.TOOL_DIR}}/crdoc-{{.CRDOC_VERSION}} {{.TOOL_DIR}}/crdoc
+
+  install:setup-envtest:
+    desc: Install setup-envtest (downloads kube-apiserver/etcd for envtest)
+    silent: true
+    status:
       - test -f {{.TOOL_DIR}}/setup-envtest
+    cmds:
+      - |
+        set -e
+        mkdir -p {{.TOOL_DIR}}
+        # setup-envtest is versioned loosely against controller-runtime, so we
+        # pin to "latest" rather than a semver.
+        echo "Installing setup-envtest {{.SETUP_ENVTEST_VERSION}}..."
+        GOBIN={{.TOOL_DIR}} go install sigs.k8s.io/controller-runtime/tools/setup-envtest@{{.SETUP_ENVTEST_VERSION}}
 
   # Development tasks
   dev:build:
@@ -265,7 +305,7 @@ tasks:
   e2e:
     desc: Run chainsaw e2e tests
     deps:
-      - install-tools
+      - install:chainsaw
     cmds:
       - "{{.TOOL_DIR}}/chainsaw test test/e2e/"
     silent: false
