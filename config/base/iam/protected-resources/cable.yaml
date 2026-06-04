@@ -1,0 +1,18 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: ProtectedResource
+metadata:
+  name: inventory.miloapis.com-cable
+spec:
+  serviceRef:
+    name: "inventory.miloapis.com"
+  kind: Cable
+  plural: cables
+  singular: cable
+  permissions:
+    - list
+    - get
+    - create
+    - update
+    - delete
+    - patch
+    - watch

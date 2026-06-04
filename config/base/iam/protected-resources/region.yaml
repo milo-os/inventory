@@ -1,0 +1,18 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: ProtectedResource
+metadata:
+  name: inventory.miloapis.com-region
+spec:
+  serviceRef:
+    name: "inventory.miloapis.com"
+  kind: Region
+  plural: regions
+  singular: region
+  permissions:
+    - list
+    - get
+    - create
+    - update
+    - delete
+    - patch
+    - watch

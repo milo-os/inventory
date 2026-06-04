@@ -1,0 +1,15 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: inventory.miloapis.com-admin
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Admin
+    kubernetes.io/description: Full access to all inventory.miloapis.com resources
+  labels:
+    inventory.miloapis.com/role-type: admin
+    inventory.miloapis.com/service: inventory
+spec:
+  launchStage: Alpha
+  inheritedRoles:
+    - name: inventory.miloapis.com-editor

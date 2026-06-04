@@ -1,0 +1,20 @@
+# Inventory IAM for the Milo control plane.
+#
+# Authz on the Milo core control plane is Milo IAM (ProtectedResource-driven),
+# not Kubernetes RBAC: a CRD being Established grants nobody access. These
+# manifests register every inventory.miloapis.com kind as a ProtectedResource
+# and ship viewer/editor/admin/operator Roles over the group.
+#
+# Like config/base/crd, this package targets Milo, not the cluster the manager
+# pod runs in. The iam.miloapis.com CRDs only exist on Milo, so this is applied
+# there by the same Flux Kustomization that applies base/crd + the webhook
+# component — it is intentionally NOT wired into config/base (which forces the
+# inventory-system namespace and is also consumed by the dev overlay against a
+# kind cluster that has no iam.miloapis.com CRDs).
+#
+# Roles and PolicyBindings are namespace-scoped; Roles are pinned to
+# milo-system (the namespace that exists on Milo). See README.md for the
+# PolicyBinding a loader/operator principal needs to write inventory.
+resources:
+  - protected-resources
+  - roles

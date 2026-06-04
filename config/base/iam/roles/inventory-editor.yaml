@@ -1,0 +1,64 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: inventory.miloapis.com-editor
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Editor
+    kubernetes.io/description: Read/write access to all inventory.miloapis.com resources
+  labels:
+    inventory.miloapis.com/role-type: editor
+    inventory.miloapis.com/service: inventory
+spec:
+  launchStage: Alpha
+  inheritedRoles:
+    - name: inventory.miloapis.com-viewer
+  includedPermissions:
+    - inventory.miloapis.com/regions.create
+    - inventory.miloapis.com/regions.update
+    - inventory.miloapis.com/regions.patch
+    - inventory.miloapis.com/regions.delete
+    - inventory.miloapis.com/providers.create
+    - inventory.miloapis.com/providers.update
+    - inventory.miloapis.com/providers.patch
+    - inventory.miloapis.com/providers.delete
+    - inventory.miloapis.com/sites.create
+    - inventory.miloapis.com/sites.update
+    - inventory.miloapis.com/sites.patch
+    - inventory.miloapis.com/sites.delete
+    - inventory.miloapis.com/racks.create
+    - inventory.miloapis.com/racks.update
+    - inventory.miloapis.com/racks.patch
+    - inventory.miloapis.com/racks.delete
+    - inventory.miloapis.com/clusters.create
+    - inventory.miloapis.com/clusters.update
+    - inventory.miloapis.com/clusters.patch
+    - inventory.miloapis.com/clusters.delete
+    - inventory.miloapis.com/nodes.create
+    - inventory.miloapis.com/nodes.update
+    - inventory.miloapis.com/nodes.patch
+    - inventory.miloapis.com/nodes.delete
+    - inventory.miloapis.com/networkdevices.create
+    - inventory.miloapis.com/networkdevices.update
+    - inventory.miloapis.com/networkdevices.patch
+    - inventory.miloapis.com/networkdevices.delete
+    - inventory.miloapis.com/ports.create
+    - inventory.miloapis.com/ports.update
+    - inventory.miloapis.com/ports.patch
+    - inventory.miloapis.com/ports.delete
+    - inventory.miloapis.com/cables.create
+    - inventory.miloapis.com/cables.update
+    - inventory.miloapis.com/cables.patch
+    - inventory.miloapis.com/cables.delete
+    - inventory.miloapis.com/circuits.create
+    - inventory.miloapis.com/circuits.update
+    - inventory.miloapis.com/circuits.patch
+    - inventory.miloapis.com/circuits.delete
+    - inventory.miloapis.com/virtualmachines.create
+    - inventory.miloapis.com/virtualmachines.update
+    - inventory.miloapis.com/virtualmachines.patch
+    - inventory.miloapis.com/virtualmachines.delete
+    - inventory.miloapis.com/links.create
+    - inventory.miloapis.com/links.update
+    - inventory.miloapis.com/links.patch
+    - inventory.miloapis.com/links.delete

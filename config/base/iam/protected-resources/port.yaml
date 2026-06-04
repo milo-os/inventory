@@ -1,0 +1,18 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: ProtectedResource
+metadata:
+  name: inventory.miloapis.com-port
+spec:
+  serviceRef:
+    name: "inventory.miloapis.com"
+  kind: Port
+  plural: ports
+  singular: port
+  permissions:
+    - list
+    - get
+    - create
+    - update
+    - delete
+    - patch
+    - watch

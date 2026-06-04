@@ -1,0 +1,50 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: inventory.miloapis.com-viewer
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Viewer
+    kubernetes.io/description: Read-only access to all inventory.miloapis.com resources
+  labels:
+    inventory.miloapis.com/role-type: viewer
+    inventory.miloapis.com/service: inventory
+spec:
+  launchStage: Alpha
+  includedPermissions:
+    - inventory.miloapis.com/regions.get
+    - inventory.miloapis.com/regions.list
+    - inventory.miloapis.com/regions.watch
+    - inventory.miloapis.com/providers.get
+    - inventory.miloapis.com/providers.list
+    - inventory.miloapis.com/providers.watch
+    - inventory.miloapis.com/sites.get
+    - inventory.miloapis.com/sites.list
+    - inventory.miloapis.com/sites.watch
+    - inventory.miloapis.com/racks.get
+    - inventory.miloapis.com/racks.list
+    - inventory.miloapis.com/racks.watch
+    - inventory.miloapis.com/clusters.get
+    - inventory.miloapis.com/clusters.list
+    - inventory.miloapis.com/clusters.watch
+    - inventory.miloapis.com/nodes.get
+    - inventory.miloapis.com/nodes.list
+    - inventory.miloapis.com/nodes.watch
+    - inventory.miloapis.com/networkdevices.get
+    - inventory.miloapis.com/networkdevices.list
+    - inventory.miloapis.com/networkdevices.watch
+    - inventory.miloapis.com/ports.get
+    - inventory.miloapis.com/ports.list
+    - inventory.miloapis.com/ports.watch
+    - inventory.miloapis.com/cables.get
+    - inventory.miloapis.com/cables.list
+    - inventory.miloapis.com/cables.watch
+    - inventory.miloapis.com/circuits.get
+    - inventory.miloapis.com/circuits.list
+    - inventory.miloapis.com/circuits.watch
+    - inventory.miloapis.com/virtualmachines.get
+    - inventory.miloapis.com/virtualmachines.list
+    - inventory.miloapis.com/virtualmachines.watch
+    - inventory.miloapis.com/links.get
+    - inventory.miloapis.com/links.list
+    - inventory.miloapis.com/links.watch

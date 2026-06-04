@@ -1,0 +1,74 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: inventory.miloapis.com-operator
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Operator
+    kubernetes.io/description: Operational access for the inventory controller to reconcile resources, set conditions, and propagate topology labels
+  labels:
+    inventory.miloapis.com/role-type: operator
+    inventory.miloapis.com/service: inventory
+spec:
+  launchStage: Alpha
+  includedPermissions:
+    - inventory.miloapis.com/regions.get
+    - inventory.miloapis.com/regions.list
+    - inventory.miloapis.com/regions.watch
+    - inventory.miloapis.com/regions.update
+    - inventory.miloapis.com/regions.patch
+    - inventory.miloapis.com/providers.get
+    - inventory.miloapis.com/providers.list
+    - inventory.miloapis.com/providers.watch
+    - inventory.miloapis.com/providers.update
+    - inventory.miloapis.com/providers.patch
+    - inventory.miloapis.com/sites.get
+    - inventory.miloapis.com/sites.list
+    - inventory.miloapis.com/sites.watch
+    - inventory.miloapis.com/sites.update
+    - inventory.miloapis.com/sites.patch
+    - inventory.miloapis.com/racks.get
+    - inventory.miloapis.com/racks.list
+    - inventory.miloapis.com/racks.watch
+    - inventory.miloapis.com/racks.update
+    - inventory.miloapis.com/racks.patch
+    - inventory.miloapis.com/clusters.get
+    - inventory.miloapis.com/clusters.list
+    - inventory.miloapis.com/clusters.watch
+    - inventory.miloapis.com/clusters.update
+    - inventory.miloapis.com/clusters.patch
+    - inventory.miloapis.com/nodes.get
+    - inventory.miloapis.com/nodes.list
+    - inventory.miloapis.com/nodes.watch
+    - inventory.miloapis.com/nodes.update
+    - inventory.miloapis.com/nodes.patch
+    - inventory.miloapis.com/networkdevices.get
+    - inventory.miloapis.com/networkdevices.list
+    - inventory.miloapis.com/networkdevices.watch
+    - inventory.miloapis.com/networkdevices.update
+    - inventory.miloapis.com/networkdevices.patch
+    - inventory.miloapis.com/ports.get
+    - inventory.miloapis.com/ports.list
+    - inventory.miloapis.com/ports.watch
+    - inventory.miloapis.com/ports.update
+    - inventory.miloapis.com/ports.patch
+    - inventory.miloapis.com/cables.get
+    - inventory.miloapis.com/cables.list
+    - inventory.miloapis.com/cables.watch
+    - inventory.miloapis.com/cables.update
+    - inventory.miloapis.com/cables.patch
+    - inventory.miloapis.com/circuits.get
+    - inventory.miloapis.com/circuits.list
+    - inventory.miloapis.com/circuits.watch
+    - inventory.miloapis.com/circuits.update
+    - inventory.miloapis.com/circuits.patch
+    - inventory.miloapis.com/virtualmachines.get
+    - inventory.miloapis.com/virtualmachines.list
+    - inventory.miloapis.com/virtualmachines.watch
+    - inventory.miloapis.com/virtualmachines.update
+    - inventory.miloapis.com/virtualmachines.patch
+    - inventory.miloapis.com/links.get
+    - inventory.miloapis.com/links.list
+    - inventory.miloapis.com/links.watch
+    - inventory.miloapis.com/links.update
+    - inventory.miloapis.com/links.patch
