@@ -24,6 +24,9 @@ import (
 type NodeReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	// EventRecorder emits best-effort activity events on Ready transitions.
+	// May be nil (e.g. in unit tests), in which case emission is a no-op.
+	EventRecorder *EventRecorder
 }
 
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=nodes,verbs=get;list;watch;patch;update
@@ -121,7 +124,14 @@ func (r *NodeReconciler) patchStatusIfChanged(ctx context.Context, original, cur
 	if reflect.DeepEqual(original.Status, current.Status) {
 		return nil
 	}
-	return r.Status().Patch(ctx, current, client.MergeFrom(original))
+	if err := r.Status().Patch(ctx, current, client.MergeFrom(original)); err != nil {
+		return err
+	}
+	r.EventRecorder.EmitReadyTransition(ctx, current,
+		inventoryv1alpha1.GroupVersion.WithKind("Node"),
+		current.Name,
+		original.Status.Conditions, current.Status.Conditions)
+	return nil
 }
 
 func (r *NodeReconciler) enqueueForSite(ctx context.Context, obj client.Object) []reconcile.Request {

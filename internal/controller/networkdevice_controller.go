@@ -26,6 +26,9 @@ import (
 type NetworkDeviceReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	// EventRecorder emits best-effort activity events on Ready transitions.
+	// May be nil (e.g. in unit tests), in which case emission is a no-op.
+	EventRecorder *EventRecorder
 }
 
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=networkdevices,verbs=get;list;watch;patch;update
@@ -112,7 +115,14 @@ func (r *NetworkDeviceReconciler) patchStatusIfChanged(ctx context.Context, orig
 	if reflect.DeepEqual(original.Status, current.Status) {
 		return nil
 	}
-	return r.Status().Patch(ctx, current, client.MergeFrom(original))
+	if err := r.Status().Patch(ctx, current, client.MergeFrom(original)); err != nil {
+		return err
+	}
+	r.EventRecorder.EmitReadyTransition(ctx, current,
+		inventoryv1alpha1.GroupVersion.WithKind("NetworkDevice"),
+		current.Name,
+		original.Status.Conditions, current.Status.Conditions)
+	return nil
 }
 
 func (r *NetworkDeviceReconciler) enqueueForCluster(ctx context.Context, obj client.Object) []reconcile.Request {

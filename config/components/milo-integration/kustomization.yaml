@@ -16,6 +16,14 @@ kind: Component
 # Consumers also need to ensure the inventory-system namespace has the label
 # `infra.datum.net/inject-datum-control-plane-trust-bundle: ""` so that
 # trust-manager populates the trust bundle ConfigMap.
+#
+# This component also installs the inventory ActivityPolicy resources
+# (config/milo) onto the Milo control plane. The policies only make sense
+# where the Activity system runs, so they ship with the Milo integration
+# rather than the self-contained dev overlay.
+
+components:
+  - ../../milo
 
 patches:
   # Remove the base Secret-based webhook-cert volume and volumeMount so we
@@ -50,6 +58,13 @@ patches:
                     value: /etc/kubernetes/project-discovery/auth/milo-kubeconfig.yaml
                   - name: LEADER_ELECT_NAMESPACE
                     value: milo-system
+                  # POD_NAME stamps the ReportingInstance on emitted activity
+                  # Events so operators can trace which replica reported a
+                  # transition.
+                  - name: POD_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.name
                 volumeMounts:
                   - mountPath: /etc/kubernetes/pki/trust
                     name: trust-bundle

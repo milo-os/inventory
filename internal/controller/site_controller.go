@@ -32,6 +32,9 @@ const requeueAfterMissingRef = 30 * time.Second
 type SiteReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	// EventRecorder emits best-effort activity events on Ready transitions.
+	// May be nil (e.g. in unit tests), in which case emission is a no-op.
+	EventRecorder *EventRecorder
 }
 
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=sites,verbs=get;list;watch;patch;update
@@ -117,7 +120,14 @@ func (r *SiteReconciler) patchStatusIfChanged(ctx context.Context, original, cur
 	if reflect.DeepEqual(original.Status, current.Status) {
 		return nil
 	}
-	return r.Status().Patch(ctx, current, client.MergeFrom(original))
+	if err := r.Status().Patch(ctx, current, client.MergeFrom(original)); err != nil {
+		return err
+	}
+	r.EventRecorder.EmitReadyTransition(ctx, current,
+		inventoryv1alpha1.GroupVersion.WithKind("Site"),
+		displayNameOrName(current.Spec.DisplayName, current.Name),
+		original.Status.Conditions, current.Status.Conditions)
+	return nil
 }
 
 // enqueueForRegion returns the Sites whose spec.regionRef.name matches the

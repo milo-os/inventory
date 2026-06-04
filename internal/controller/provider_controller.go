@@ -16,6 +16,9 @@ import (
 type ProviderReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	// EventRecorder emits best-effort activity events on Ready transitions.
+	// May be nil (e.g. in unit tests), in which case emission is a no-op.
+	EventRecorder *EventRecorder
 }
 
 // +kubebuilder:rbac:groups=inventory.miloapis.com,resources=providers,verbs=get;list;watch
@@ -41,6 +44,11 @@ func (r *ProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		log.Error(err, "failed to patch Provider status")
 		return ctrl.Result{}, err
 	}
+
+	r.EventRecorder.EmitReadyTransition(ctx, provider,
+		inventoryv1alpha1.GroupVersion.WithKind("Provider"),
+		displayNameOrName(provider.Spec.DisplayName, provider.Name),
+		original.Status.Conditions, provider.Status.Conditions)
 
 	return ctrl.Result{}, nil
 }
