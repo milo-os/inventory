@@ -1,11 +1,11 @@
 # GoReleaser config for the datumctl-inventory plugin.
 #
 # This repo's primary artifact is the inventory operator container image
-# (see .github/workflows/publish.yaml). This config releases ONLY the
-# datumctl-inventory CLI plugin, on its own tag prefix so plugin releases are
-# decoupled from operator versions.
+# (see .github/workflows/publish.yaml). This config builds ONLY the
+# datumctl-inventory CLI plugin and appends its archives to the SAME GitHub
+# release as the operator — the plugin shares the operator's tag/version.
 #
-# Release a plugin version by pushing a tag:  datumctl-inventory/vX.Y.Z
+# Triggered by release-datumctl-inventory.yaml on `release: published`.
 #
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
@@ -52,6 +52,11 @@ checksum:
 
 sboms:
   - artifacts: archive
+
+# Append plugin archives to the operator's existing GitHub release for this
+# tag rather than creating a separate release.
+release:
+  mode: append
 
 changelog:
   disable: true

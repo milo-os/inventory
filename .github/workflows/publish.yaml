@@ -5,11 +5,6 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'README.md'
-    # datumctl-inventory plugin releases use their own tag prefix and are
-    # built by release-datumctl-inventory.yaml — they must not rebuild the
-    # operator image.
-    tags-ignore:
-      - 'datumctl-inventory/**'
 
   release:
     types: ['published']
@@ -22,10 +17,6 @@ jobs:
         uses: actions/checkout@v6
 
   publish-container-image:
-    # Skip when the triggering release is a plugin release (see tags-ignore above
-    # for the push path). On push/branch events github.event.release is empty, so
-    # this evaluates true and the operator still publishes as before.
-    if: ${{ !startsWith(github.event.release.tag_name, 'datumctl-inventory/') }}
     permissions:
       id-token: write
       contents: read

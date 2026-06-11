@@ -45,6 +45,14 @@ go build -o datumctl-inventory ./cmd/datumctl-inventory
 The version reported in `--plugin-manifest` is set via
 `-ldflags "-X main.version=<version>"` at release time.
 
+## Releases
+
+The plugin **shares the operator's version and tag**. When an `inventory`
+release is published, `.github/workflows/release-datumctl-inventory.yaml` runs
+goreleaser and *appends* `datumctl-inventory_{OS}_{Arch}` archives plus
+`checksums.txt` to that same GitHub release (alongside the operator image
+published by `publish.yaml`). So plugin `vX.Y.Z` == operator `vX.Y.Z`.
+
 ## Local use
 
 Build the binary onto your `PATH` named `datumctl-inventory`, then:

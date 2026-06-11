@@ -1,14 +1,13 @@
 name: Release datumctl-inventory plugin
 
-# Releases the datumctl-inventory CLI plugin only — not the operator image.
-# Triggered by tags of the form datumctl-inventory/vX.Y.Z so plugin releases
-# are decoupled from operator versions. The operator's publish.yaml ignores
-# these tags and skips the matching release event.
+# Builds the datumctl-inventory CLI plugin and appends its archives to the
+# GitHub release that triggered this run — the same release/tag the operator
+# uses. Runs in parallel with publish.yaml (which builds the operator image)
+# on the same `release: published` event.
 
 on:
-  push:
-    tags:
-      - 'datumctl-inventory/v*'
+  release:
+    types: ['published']
 
 permissions:
   contents: write
@@ -30,12 +29,6 @@ jobs:
         with:
           go-version-file: go.mod
 
-      # Strip the datumctl-inventory/ tag prefix so goreleaser derives the
-      # plugin's own version instead of the repo's latest (operator) tag.
-      - name: Resolve plugin version
-        id: ver
-        run: echo "version=${GITHUB_REF_NAME#datumctl-inventory/}" >> "$GITHUB_OUTPUT"
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -44,4 +37,3 @@ jobs:
           args: release --clean -f .goreleaser.datumctl-inventory.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_CURRENT_TAG: ${{ steps.ver.outputs.version }}
