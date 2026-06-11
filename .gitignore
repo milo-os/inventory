@@ -16,3 +16,7 @@ kind
 
 # compiled manager binary from `go build ./cmd/inventory`
 /inventory
+
+# datumctl-inventory plugin build artifact
+/datumctl-inventory
+cmd/datumctl-inventory/datumctl-inventory
