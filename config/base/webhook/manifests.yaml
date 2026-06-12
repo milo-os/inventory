@@ -242,3 +242,44 @@ webhooks:
     resources:
     - virtualmachines
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-graph-inventory-miloapis-com-v1alpha2-edge
+  failurePolicy: Fail
+  name: vedge.v1alpha2.graph.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - graph.inventory.miloapis.com
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - edges
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-graph-inventory-miloapis-com-v1alpha2-node
+  failurePolicy: Fail
+  name: vnode.v1alpha2.graph.inventory.miloapis.com
+  rules:
+  - apiGroups:
+    - graph.inventory.miloapis.com
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - nodes
+  sideEffects: None

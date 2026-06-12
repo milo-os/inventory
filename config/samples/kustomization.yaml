@@ -13,4 +13,5 @@ resources:
 - inventory_v1alpha1_virtualmachine.yaml
 - inventory_v1alpha1_link.yaml
 - inventory_v1alpha1_fleet.yaml
+- graph_v1alpha2_demo.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples

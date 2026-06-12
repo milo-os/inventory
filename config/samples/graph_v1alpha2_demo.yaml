@@ -1,0 +1,80 @@
+# Property-graph model prototype (RFC milo-os/inventory#43).
+#
+# Demonstrates the v1alpha2 model: NodeType/EdgeType define closed attribute
+# schemas; Node/Edge are validated against them by the admission webhook.
+# A Site node and a Host node (the former compute Node) are linked by a
+# `located-in` edge.
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: NodeType
+metadata:
+  name: Site
+spec:
+  displayName: Site
+  attributes:
+  - key: displayName
+    type: String
+    required: true
+  - key: siteType
+    type: String
+    enum: [Datacenter, AvailabilityZone, Edge, Virtual]
+    required: true
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: NodeType
+metadata:
+  name: Host
+spec:
+  displayName: Host (compute node)
+  attributes:
+  - key: cpuCores
+    type: Integer
+    required: true
+  - key: cpuArchitecture
+    type: String
+    enum: [amd64, arm64]
+    required: true
+  - key: memoryBytes
+    type: Integer
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: EdgeType
+metadata:
+  name: located-in
+spec:
+  displayName: located in
+  endpoints:
+    fromTypes: [Host, NetworkDevice, Rack]
+    toTypes: [Site]
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: Node
+metadata:
+  name: site-iad1
+spec:
+  type: Site
+  attributes:
+    displayName: US East 1
+    siteType: Datacenter
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: Node
+metadata:
+  name: host-001
+spec:
+  type: Host
+  attributes:
+    cpuCores: "64"
+    cpuArchitecture: amd64
+    memoryBytes: "274877906944"
+---
+apiVersion: graph.inventory.miloapis.com/v1alpha2
+kind: Edge
+metadata:
+  name: host-001-in-iad1
+spec:
+  type: located-in
+  from:
+    name: host-001
+  to:
+    name: site-iad1

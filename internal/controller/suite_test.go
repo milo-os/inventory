@@ -24,8 +24,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	inventoryv1alpha1 "go.miloapis.com/inventory/api/v1alpha1"
+	inventoryv1alpha2 "go.miloapis.com/inventory/api/v1alpha2"
 	inventorycontroller "go.miloapis.com/inventory/internal/controller"
+	"go.miloapis.com/inventory/internal/graph"
 	webhookv1alpha1 "go.miloapis.com/inventory/internal/webhook/v1alpha1"
+	webhookv1alpha2 "go.miloapis.com/inventory/internal/webhook/v1alpha2"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -67,6 +70,7 @@ var _ = BeforeSuite(func() {
 
 	utilruntime.Must(clientgoscheme.AddToScheme(testScheme))
 	utilruntime.Must(inventoryv1alpha1.AddToScheme(testScheme))
+	utilruntime.Must(inventoryv1alpha2.AddToScheme(testScheme))
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: testScheme})
 	Expect(err).NotTo(HaveOccurred())
@@ -86,6 +90,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	Expect(inventorycontroller.SetupIndexers(testCtx, mgr)).To(Succeed())
+	Expect(graph.SetupIndexers(testCtx, mgr)).To(Succeed())
 
 	Expect((&inventorycontroller.RegionReconciler{
 		Client: mgr.GetClient(),
@@ -135,6 +140,14 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr)).To(Succeed())
+	Expect((&graph.NodeReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)).To(Succeed())
+	Expect((&graph.EdgeReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)).To(Succeed())
 
 	Expect(webhookv1alpha1.SetupRegionWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupProviderWebhookWithManager(mgr)).To(Succeed())
@@ -148,6 +161,8 @@ var _ = BeforeSuite(func() {
 	Expect(webhookv1alpha1.SetupCableWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupCircuitWebhookWithManager(mgr)).To(Succeed())
 	Expect(webhookv1alpha1.SetupVirtualMachineWebhookWithManager(mgr)).To(Succeed())
+	Expect(webhookv1alpha2.SetupNodeWebhookWithManager(mgr)).To(Succeed())
+	Expect(webhookv1alpha2.SetupEdgeWebhookWithManager(mgr)).To(Succeed())
 
 	go func() {
 		defer GinkgoRecover()
