@@ -9,7 +9,7 @@ import (
 // EdgeSpec defines the desired state of a graph Edge.
 //
 // +kubebuilder:validation:XValidation:rule="self.type == oldSelf.type",message="type is immutable"
-// +kubebuilder:validation:XValidation:rule="self.from != self.to",message="edge endpoints must be distinct"
+// +kubebuilder:validation:XValidation:rule="self.from.name != self.to.name",message="edge endpoints must be distinct"
 type EdgeSpec struct {
 	// Type names the relationship class. The value must match the name of an
 	// existing EdgeType, which constrains the endpoint node types and the

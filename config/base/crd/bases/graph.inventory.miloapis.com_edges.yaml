@@ -106,7 +106,7 @@ spec:
             - message: type is immutable
               rule: self.type == oldSelf.type
             - message: edge endpoints must be distinct
-              rule: self.from != self.to
+              rule: self.from.name != self.to.name
           status:
             default:
               conditions:
