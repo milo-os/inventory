@@ -6,3 +6,8 @@ resources:
   - inventory-editor.yaml
   - inventory-admin.yaml
   - inventory-operator.yaml
+  # graph.inventory.miloapis.com/v1alpha2 (property-graph model)
+  - graph-viewer.yaml
+  - graph-editor.yaml
+  - graph-admin.yaml
+  - graph-operator.yaml

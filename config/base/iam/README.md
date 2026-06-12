@@ -22,6 +22,19 @@ below).
 - `policybindings.example.yaml` — a template binding a principal across the
   whole group. **Not** in `kustomization.yaml` — subjects are per-environment.
 
+### Graph group (`graph.inventory.miloapis.com`, v1alpha2)
+
+The v1alpha2 property-graph model adds a second API group whose kinds are the
+generic `Node`, `Edge`, `NodeType`, and `EdgeType`. It gets the same treatment:
+
+- `protected-resources/graph-{node,edge,nodetype,edgetype}.yaml`
+- `roles/graph-{viewer,editor,admin,operator}.yaml`
+  (`graph.inventory.miloapis.com-<role>`), same semantics as the
+  `inventory.miloapis.com-*` roles above.
+
+Bindings for the graph group reference these role names and are likewise
+per-environment.
+
 ## Deployment
 
 Mirrors `config/base/crd`: this targets **Milo**, not the cluster the manager

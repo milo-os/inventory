@@ -1,0 +1,32 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: graph.inventory.miloapis.com-editor
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Graph Editor
+    kubernetes.io/description: Read/write access to all graph.inventory.miloapis.com resources
+  labels:
+    graph.inventory.miloapis.com/role-type: editor
+    graph.inventory.miloapis.com/service: inventory-graph
+spec:
+  launchStage: Alpha
+  inheritedRoles:
+    - name: graph.inventory.miloapis.com-viewer
+  includedPermissions:
+    - graph.inventory.miloapis.com/nodes.create
+    - graph.inventory.miloapis.com/nodes.update
+    - graph.inventory.miloapis.com/nodes.patch
+    - graph.inventory.miloapis.com/nodes.delete
+    - graph.inventory.miloapis.com/edges.create
+    - graph.inventory.miloapis.com/edges.update
+    - graph.inventory.miloapis.com/edges.patch
+    - graph.inventory.miloapis.com/edges.delete
+    - graph.inventory.miloapis.com/nodetypes.create
+    - graph.inventory.miloapis.com/nodetypes.update
+    - graph.inventory.miloapis.com/nodetypes.patch
+    - graph.inventory.miloapis.com/nodetypes.delete
+    - graph.inventory.miloapis.com/edgetypes.create
+    - graph.inventory.miloapis.com/edgetypes.update
+    - graph.inventory.miloapis.com/edgetypes.patch
+    - graph.inventory.miloapis.com/edgetypes.delete
