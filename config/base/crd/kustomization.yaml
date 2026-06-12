@@ -14,6 +14,10 @@ resources:
 - bases/inventory.miloapis.com_circuits.yaml
 - bases/inventory.miloapis.com_virtualmachines.yaml
 - bases/inventory.miloapis.com_links.yaml
+- bases/graph.inventory.miloapis.com_nodetypes.yaml
+- bases/graph.inventory.miloapis.com_edgetypes.yaml
+- bases/graph.inventory.miloapis.com_nodes.yaml
+- bases/graph.inventory.miloapis.com_edges.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patches:

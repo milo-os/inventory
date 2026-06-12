@@ -12,6 +12,26 @@ rules:
   - create
   - patch
 - apiGroups:
+  - graph.inventory.miloapis.com
+  resources:
+  - edges
+  - edgetypes
+  - nodes
+  - nodetypes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - graph.inventory.miloapis.com
+  resources:
+  - edges/status
+  - nodes/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - inventory.miloapis.com
   resources:
   - cables
