@@ -1,0 +1,34 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: Role
+metadata:
+  name: graph.inventory.miloapis.com-operator
+  namespace: milo-system
+  annotations:
+    kubernetes.io/display-name: Inventory Graph Operator
+    kubernetes.io/description: Operational access for the inventory controller to reconcile graph resources and set conditions
+  labels:
+    graph.inventory.miloapis.com/role-type: operator
+    graph.inventory.miloapis.com/service: inventory-graph
+spec:
+  launchStage: Alpha
+  includedPermissions:
+    - graph.inventory.miloapis.com/nodes.get
+    - graph.inventory.miloapis.com/nodes.list
+    - graph.inventory.miloapis.com/nodes.watch
+    - graph.inventory.miloapis.com/nodes.update
+    - graph.inventory.miloapis.com/nodes.patch
+    - graph.inventory.miloapis.com/edges.get
+    - graph.inventory.miloapis.com/edges.list
+    - graph.inventory.miloapis.com/edges.watch
+    - graph.inventory.miloapis.com/edges.update
+    - graph.inventory.miloapis.com/edges.patch
+    - graph.inventory.miloapis.com/nodetypes.get
+    - graph.inventory.miloapis.com/nodetypes.list
+    - graph.inventory.miloapis.com/nodetypes.watch
+    - graph.inventory.miloapis.com/nodetypes.update
+    - graph.inventory.miloapis.com/nodetypes.patch
+    - graph.inventory.miloapis.com/edgetypes.get
+    - graph.inventory.miloapis.com/edgetypes.list
+    - graph.inventory.miloapis.com/edgetypes.watch
+    - graph.inventory.miloapis.com/edgetypes.update
+    - graph.inventory.miloapis.com/edgetypes.patch

@@ -14,3 +14,8 @@ resources:
   - circuit.yaml
   - virtualmachine.yaml
   - link.yaml
+  # graph.inventory.miloapis.com/v1alpha2 (property-graph model)
+  - graph-node.yaml
+  - graph-edge.yaml
+  - graph-nodetype.yaml
+  - graph-edgetype.yaml

@@ -1,0 +1,18 @@
+apiVersion: iam.miloapis.com/v1alpha1
+kind: ProtectedResource
+metadata:
+  name: graph.inventory.miloapis.com-node
+spec:
+  serviceRef:
+    name: "graph.inventory.miloapis.com"
+  kind: Node
+  plural: nodes
+  singular: node
+  permissions:
+    - list
+    - get
+    - create
+    - update
+    - delete
+    - patch
+    - watch
