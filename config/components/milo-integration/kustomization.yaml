@@ -17,13 +17,12 @@ kind: Component
 # `infra.datum.net/inject-datum-control-plane-trust-bundle: ""` so that
 # trust-manager populates the trust bundle ConfigMap.
 #
-# This component also installs the inventory ActivityPolicy resources
-# (config/milo) onto the Milo control plane. The policies only make sense
-# where the Activity system runs, so they ship with the Milo integration
-# rather than the self-contained dev overlay.
-
-components:
-  - ../../milo
+# This component contains only the controller's Milo-wiring patches. The
+# inventory ActivityPolicy resources are NOT installed here: they require the
+# activity.miloapis.com CRDs served only by the Milo control plane's
+# activity-system apiserver, and this component is consumed by the infra
+# cluster (which has no such CRDs). The policies live in config/milo and are
+# applied directly to the Milo control plane by a dedicated Flux Kustomization.
 
 patches:
   # Remove the base Secret-based webhook-cert volume and volumeMount so we
