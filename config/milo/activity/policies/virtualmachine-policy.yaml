@@ -27,6 +27,6 @@ spec:
     - name: ready
       match: "has(event.metadata.annotations) && event.metadata.annotations['inventory.miloapis.com/event-type'] == 'inventory.virtualmachine.ready'"
       summary: "Inventory VirtualMachine {{ link(event.metadata.annotations['inventory.miloapis.com/display-name'], event.regarding) }} is ready"
-    - name: not_ready
+    - name: not-ready
       match: "has(event.metadata.annotations) && event.metadata.annotations['inventory.miloapis.com/event-type'] == 'inventory.virtualmachine.not_ready'"
       summary: "Inventory VirtualMachine {{ link(event.metadata.annotations['inventory.miloapis.com/display-name'], event.regarding) }} is not ready: {{ event.note }}"

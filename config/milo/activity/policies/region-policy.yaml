@@ -30,6 +30,6 @@ spec:
     - name: ready
       match: "has(event.metadata.annotations) && event.metadata.annotations['inventory.miloapis.com/event-type'] == 'inventory.region.ready'"
       summary: "Inventory Region {{ link(event.metadata.annotations['inventory.miloapis.com/display-name'], event.regarding) }} is ready"
-    - name: not_ready
+    - name: not-ready
       match: "has(event.metadata.annotations) && event.metadata.annotations['inventory.miloapis.com/event-type'] == 'inventory.region.not_ready'"
       summary: "Inventory Region {{ link(event.metadata.annotations['inventory.miloapis.com/display-name'], event.regarding) }} is not ready: {{ event.note }}"
