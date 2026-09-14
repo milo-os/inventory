@@ -6,14 +6,12 @@ Asset Inventory is a pure-data-model registry of infrastructure assets (regions,
 
 ## Usage
 
-Inventory resources are **project-scoped** and served by the
-`inventory.miloapis.com` API group, behind project access control. Manage them
-with [`datumctl`](https://github.com/datum-cloud/datumctl) against the project's
-control plane:
+Every inventory kind is **cluster-scoped** and served by the
+`inventory.miloapis.com` API group on the organization control plane. There is
+no per-project copy, so no project needs to be selected. Manage them with
+[`datumctl`](https://github.com/datum-cloud/datumctl):
 
 ```bash
-datumctl auth update-kubeconfig --project your-project
-
 cat <<'EOF' | datumctl apply -f -
 apiVersion: inventory.miloapis.com/v1alpha1
 kind: Region
@@ -28,6 +26,31 @@ datumctl get regions
 
 See [docs/usage.md](docs/usage.md) for an end-to-end walkthrough, and
 [docs/api/inventory.md](docs/api/inventory.md) for the generated API reference.
+
+### The `datumctl inventory` plugin
+
+This repository also ships a [`datumctl`](https://github.com/datum-cloud/datumctl)
+plugin that gives the inventory a purpose-built read view -- filters, a
+region/site/node tree, and fleet-wide counts -- rather than raw `get` output:
+
+```bash
+datumctl plugin install milo-os/inventory
+
+datumctl inventory get sites              # or: datumctl inventory sites
+datumctl inventory sites --provider netactuate
+datumctl inventory nodes --cluster us-central-1-lab
+datumctl inventory tree
+datumctl inventory summary
+```
+
+`get` accepts either spelling of a kind, singular or plural and
+case-insensitively, so `get sites`, `get site` and `get Site` are equivalent.
+Each kind's own filter flags work after it.
+
+The plugin source lives in [`cmd/datumctl-inventory`](cmd/datumctl-inventory)
+and is released from this repository's tags by
+[`.goreleaser-plugin.yaml`](.goreleaser-plugin.yaml), separately from the
+operator's container image and kustomize bundle.
 
 ## Development
 
