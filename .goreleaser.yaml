@@ -1,0 +1,76 @@
+# GoReleaser config for the milo-inventory datumctl plugin.
+#
+# This file releases the PLUGIN ONLY. The operator ships as a container image
+# and a kustomize bundle, both built by the reusable workflows in
+# .github/workflows/publish.yaml; goreleaser never touches those artifacts.
+#
+# Release a version by publishing a GitHub release on a semver tag (vX.Y.Z).
+# The publish workflow runs goreleaser, which builds the plugin for each
+# supported platform and publishes per-platform archives + checksums.txt as
+# release assets. The datumctl plugin catalog entry (milo-os/cli-plugins,
+# plugins/inventory.yaml) references these exact asset names, so the archive
+# name_template below must not change casually.
+#
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: milo-inventory
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: milo-inventory
+    main: ./cmd/milo-inventory
+    binary: milo-inventory
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Inject the release version (the git tag without its leading "v") so the
+    # published binary's --plugin-manifest reports the version it was released
+    # under, rather than the in-source default.
+    ldflags:
+      - -s -w
+      - -X main.pluginVersion={{ .Version }}
+
+archives:
+  - id: milo-inventory
+    # name template renders OS title-cased (Linux/Darwin/Windows) and amd64 as
+    # x86_64, matching goreleaser's common convention and the datumctl plugin
+    # catalog entry (milo-inventory_Darwin_arm64, milo-inventory_Linux_x86_64, ...).
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+
+sboms:
+  - artifacts: archive
+
+release:
+  # The operator's release notes are written by hand; keep the plugin's assets
+  # from replacing an existing release body.
+  mode: append
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
