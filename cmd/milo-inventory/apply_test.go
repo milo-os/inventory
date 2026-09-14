@@ -65,15 +65,17 @@ func TestReadManifestsParsesAndOrders(t *testing.T) {
 }
 
 func TestReadManifestsRejectsUnsupportedKind(t *testing.T) {
+	// A kind outside the inventory group entirely: apply handles all twelve
+	// inventory kinds, so the rejection path needs something it never will.
 	const m = `
-apiVersion: inventory.miloapis.com/v1alpha1
-kind: Rack
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: rack-a
+  name: not-inventory
 `
 	_, err := readManifests(strings.NewReader(m), []string{"-"})
-	if err == nil || !strings.Contains(err.Error(), "unsupported kind") {
-		t.Fatalf("want unsupported-kind error, got %v", err)
+	if err == nil {
+		t.Fatal("want an error for a non-inventory kind, got nil")
 	}
 }
 
@@ -88,15 +90,48 @@ func TestReadManifestsEmpty(t *testing.T) {
 }
 
 func TestKindOrder(t *testing.T) {
-	if _, ok := kindOrder("Provider"); !ok {
-		t.Error("Provider should be ordered")
+	for _, k := range []string{
+		"Provider", "Region", "Site", "Rack", "Cluster", "Node",
+		"NetworkDevice", "VirtualMachine", "Port", "Cable", "Link", "Circuit",
+	} {
+		if _, ok := kindOrder(k); !ok {
+			t.Errorf("%s should be applyable", k)
+		}
 	}
-	p, _ := kindOrder("Provider")
-	n, _ := kindOrder("Node")
-	if !(p < n) {
-		t.Errorf("Provider (%d) should sort before Node (%d)", p, n)
+	if _, ok := kindOrder("ConfigMap"); ok {
+		t.Error("ConfigMap should not be applyable")
 	}
-	if _, ok := kindOrder("Rack"); ok {
-		t.Error("Rack should not be applyable")
+}
+
+// Apply order has to satisfy the admission-time reference checks: a referent
+// must already exist when its dependant is admitted.
+func TestKindOrderSatisfiesDependencies(t *testing.T) {
+	for _, dep := range []struct{ before, after string }{
+		{"Provider", "Site"},
+		{"Provider", "Circuit"},
+		{"Provider", "VirtualMachine"},
+		{"Region", "Site"},
+		{"Site", "Rack"},
+		{"Site", "Cluster"},
+		{"Site", "Node"},
+		{"Rack", "Node"},          // Node.placement.rackRef
+		{"Rack", "NetworkDevice"}, // NetworkDevice.placement.rackRef
+		{"Cluster", "Node"},
+		{"Cluster", "NetworkDevice"},
+		{"Node", "VirtualMachine"}, // VirtualMachine.hostRef
+		{"Node", "Port"},           // Port.deviceRef
+		{"NetworkDevice", "Port"},
+		{"Port", "Cable"},   // Cable.endpoints
+		{"Cable", "Link"},   // Link.cableRefs
+		{"Port", "Circuit"}, // Circuit endpoints may terminate at a Port
+	} {
+		b, okB := kindOrder(dep.before)
+		a, okA := kindOrder(dep.after)
+		if !okB || !okA {
+			t.Fatalf("both %s and %s must be applyable", dep.before, dep.after)
+		}
+		if b >= a {
+			t.Errorf("%s (%d) must be applied before %s (%d)", dep.before, b, dep.after, a)
+		}
 	}
 }

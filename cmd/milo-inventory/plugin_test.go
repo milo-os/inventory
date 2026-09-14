@@ -105,10 +105,11 @@ func TestPrintSummary(t *testing.T) {
 		site("b", "r1", "netactuate"),
 		site("c", "r2", "vultr"),
 	}}
+	counts := []kindCount{{"sites", 3}, {"racks", 0}, {"cables", 7}}
 	var buf bytes.Buffer
-	printSummary(&buf, inventoryv1alpha1.ProviderList{}, inventoryv1alpha1.RegionList{}, sites, inventoryv1alpha1.ClusterList{}, inventoryv1alpha1.NodeList{})
+	printSummary(&buf, counts, sites, inventoryv1alpha1.NodeList{})
 	out := buf.String()
-	for _, want := range []string{"Totals", "Per region", "Sites per provider", "netactuate", "r1"} {
+	for _, want := range []string{"Totals", "Per region", "Sites per provider", "netactuate", "r1", "racks", "cables"} {
 		if !strings.Contains(out, want) {
 			t.Errorf("summary missing %q:\n%s", want, out)
 		}

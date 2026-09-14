@@ -23,7 +23,25 @@ const fieldManager = "datumctl-inventory"
 
 // applyOrder lists the inventory kinds apply handles, in dependency order:
 // parents are applied before the children that reference them.
-var applyOrder = []string{"Provider", "Region", "Site", "Cluster", "Node"}
+//
+// Rack precedes Node and NetworkDevice because their placement webhook
+// resolves rackRef on admission; Port precedes Cable, and Cable precedes Link,
+// for the same reason. Provider leads because Site, Circuit and VirtualMachine
+// all reference it.
+var applyOrder = []string{
+	"Provider",
+	"Region",
+	"Site",
+	"Rack",
+	"Cluster",
+	"Node",
+	"NetworkDevice",
+	"VirtualMachine",
+	"Port",
+	"Cable",
+	"Link",
+	"Circuit",
+}
 
 func kindOrder(kind string) (int, bool) {
 	for i, k := range applyOrder {
