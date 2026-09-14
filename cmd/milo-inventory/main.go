@@ -70,6 +70,7 @@ platform API directly; they do not take an organization or project scope.`,
 		newListCmd(virtualMachinesView),
 		newTreeCmd(),
 		newSummaryCmd(),
+		newKindsCmd(),
 		newApplyCmd(),
 	)
 	root.AddCommand(newGetCmd(root))
