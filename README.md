@@ -29,6 +29,35 @@ datumctl get regions
 See [docs/usage.md](docs/usage.md) for an end-to-end walkthrough, and
 [docs/api/inventory.md](docs/api/inventory.md) for the generated API reference.
 
+### The `datumctl inventory` plugin
+
+This repository also ships a [`datumctl`](https://github.com/datum-cloud/datumctl)
+plugin that gives the inventory a purpose-built read view -- filters, a
+region/site/node tree, and fleet-wide counts -- rather than raw `get` output:
+
+```bash
+datumctl plugin install inventory
+
+datumctl inventory get sites              # or: datumctl inventory sites
+datumctl inventory sites --provider netactuate
+datumctl inventory nodes --cluster us-central-1-lab
+datumctl inventory tree
+datumctl inventory summary
+```
+
+`get` accepts either spelling of a kind, singular or plural and
+case-insensitively, so `get sites`, `get site` and `get Site` are equivalent.
+Each kind's own filter flags work after it.
+
+The plugin source lives in [`cmd/milo-inventory`](cmd/milo-inventory) and is
+released from this repository's tags by
+[`.goreleaser.yaml`](.goreleaser.yaml), separately from the operator's
+container image and kustomize bundle. Publishing a release also opens a PR
+against the Milo plugin catalog
+([`milo-os/cli-plugins`](https://github.com/milo-os/cli-plugins),
+`plugins/inventory.yaml`), which is what makes `datumctl plugin install
+inventory` resolve.
+
 ## Development
 
 ```bash
