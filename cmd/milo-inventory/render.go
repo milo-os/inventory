@@ -12,16 +12,18 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+
 	"sigs.k8s.io/yaml"
 )
 
 const none = "<none>"
 
-// emit renders a typed list in the format selected by the --output flag. For
-// table output it prints headers + rows; for json/yaml it marshals the (already
-// filtered) typed list so scripted callers get full objects.
-func emit(cmd *cobra.Command, list runtime.Object, headers []string, rows [][]string) error {
+// emit renders a listing in the format selected by the --output flag. For
+// table output it prints headers + rows; for json/yaml it marshals the
+// (already filtered) value so scripted callers get full objects. The value is
+// a typed API list for the resource commands, and a plain struct for the ones
+// that describe the plugin itself.
+func emit(cmd *cobra.Command, list any, headers []string, rows [][]string) error {
 	format, _ := cmd.Flags().GetString("output")
 	out := cmd.OutOrStdout()
 

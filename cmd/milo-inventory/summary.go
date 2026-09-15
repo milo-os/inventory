@@ -9,6 +9,8 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/api/meta"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	inventoryv1alpha1 "go.miloapis.com/inventory/api/v1alpha1"
 )
@@ -28,43 +30,65 @@ sites per provider.`,
 				return err
 			}
 			ctx := cmd.Context()
+			var counts []kindCount
 
 			var providers inventoryv1alpha1.ProviderList
 			var regions inventoryv1alpha1.RegionList
 			var sites inventoryv1alpha1.SiteList
 			var clusters inventoryv1alpha1.ClusterList
 			var nodes inventoryv1alpha1.NodeList
-			if err := c.List(ctx, &providers); err != nil {
-				return listErr("providers", err)
-			}
-			if err := c.List(ctx, &regions); err != nil {
-				return listErr("regions", err)
-			}
-			if err := c.List(ctx, &sites); err != nil {
-				return listErr("sites", err)
-			}
-			if err := c.List(ctx, &clusters); err != nil {
-				return listErr("clusters", err)
-			}
-			if err := c.List(ctx, &nodes); err != nil {
-				return listErr("nodes", err)
+			var racks inventoryv1alpha1.RackList
+			var devices inventoryv1alpha1.NetworkDeviceList
+			var ports inventoryv1alpha1.PortList
+			var cables inventoryv1alpha1.CableList
+			var links inventoryv1alpha1.LinkList
+			var circuits inventoryv1alpha1.CircuitList
+			var vms inventoryv1alpha1.VirtualMachineList
+
+			// Ordered so the totals table reads as the containment hierarchy
+			// does: geography, then physical plant, then logical overlay.
+			for _, l := range []struct {
+				name string
+				list client.ObjectList
+			}{
+				{"providers", &providers},
+				{"regions", &regions},
+				{"sites", &sites},
+				{"racks", &racks},
+				{"clusters", &clusters},
+				{"nodes", &nodes},
+				{"networkdevices", &devices},
+				{"virtualmachines", &vms},
+				{"ports", &ports},
+				{"cables", &cables},
+				{"links", &links},
+				{"circuits", &circuits},
+			} {
+				if err := c.List(ctx, l.list); err != nil {
+					return listErr(l.name, err)
+				}
+				counts = append(counts, kindCount{l.name, meta.LenList(l.list)})
 			}
 
-			printSummary(cmd.OutOrStdout(), providers, regions, sites, clusters, nodes)
+			printSummary(cmd.OutOrStdout(), counts, sites, nodes)
 			return nil
 		},
 	}
 }
 
-func printSummary(out io.Writer, providers inventoryv1alpha1.ProviderList, regions inventoryv1alpha1.RegionList, sites inventoryv1alpha1.SiteList, clusters inventoryv1alpha1.ClusterList, nodes inventoryv1alpha1.NodeList) {
+// kindCount is one row of the totals table.
+type kindCount struct {
+	kind  string
+	count int
+}
+
+func printSummary(out io.Writer, counts []kindCount, sites inventoryv1alpha1.SiteList, nodes inventoryv1alpha1.NodeList) {
 	fmt.Fprintln(out, "Totals")
-	_ = printTable(out, []string{"KIND", "COUNT"}, [][]string{
-		{"providers", strconv.Itoa(len(providers.Items))},
-		{"regions", strconv.Itoa(len(regions.Items))},
-		{"sites", strconv.Itoa(len(sites.Items))},
-		{"clusters", strconv.Itoa(len(clusters.Items))},
-		{"nodes", strconv.Itoa(len(nodes.Items))},
-	})
+	totalRows := make([][]string, 0, len(counts))
+	for _, kc := range counts {
+		totalRows = append(totalRows, []string{kc.kind, strconv.Itoa(kc.count)})
+	}
+	_ = printTable(out, []string{"KIND", "COUNT"}, totalRows)
 
 	sitesPerRegion := map[string]int{}
 	for _, s := range sites.Items {

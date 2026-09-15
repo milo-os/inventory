@@ -24,6 +24,18 @@ func TestCanonicalKind(t *testing.T) {
 		{"providers", "providers"},
 		{"regions", "regions"},
 		{"clusters", "clusters"},
+		{"rack", "racks"},
+		{"racks", "racks"},
+		{"networkdevice", "networkdevices"},
+		{"NetworkDevice", "networkdevices"},
+		{"nd", "networkdevices"},
+		{"port", "ports"},
+		{"cable", "cables"},
+		{"circuit", "circuits"},
+		{"link", "links"},
+		{"virtualmachine", "virtualmachines"},
+		{"vm", "virtualmachines"},
+		{"vms", "virtualmachines"},
 	} {
 		got, ok := canonicalKind(tc.in)
 		if !ok {
@@ -44,7 +56,10 @@ func TestCanonicalKind(t *testing.T) {
 
 func TestKnownKinds(t *testing.T) {
 	kinds := knownKinds()
-	want := []string{"clusters", "nodes", "providers", "regions", "sites"}
+	want := []string{
+		"cables", "circuits", "clusters", "links", "networkdevices", "nodes",
+		"ports", "providers", "racks", "regions", "sites", "virtualmachines",
+	}
 	if len(kinds) != len(want) {
 		t.Fatalf("knownKinds() = %v, want %v", kinds, want)
 	}

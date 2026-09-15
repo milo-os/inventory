@@ -15,11 +15,22 @@ import (
 // resolve, and matching is case-insensitive, so `get Site`, `get site` and
 // `get sites` are all the same request.
 var kindAliases = map[string]string{
-	"provider": "providers",
-	"region":   "regions",
-	"site":     "sites",
-	"cluster":  "clusters",
-	"node":     "nodes",
+	"provider":       "providers",
+	"region":         "regions",
+	"site":           "sites",
+	"cluster":        "clusters",
+	"node":           "nodes",
+	"rack":           "racks",
+	"networkdevice":  "networkdevices",
+	"port":           "ports",
+	"cable":          "cables",
+	"circuit":        "circuits",
+	"link":           "links",
+	"virtualmachine": "virtualmachines",
+	// Shorthands the API itself advertises, so `get vm` matches `datumctl get vm`.
+	"vm":  "virtualmachines",
+	"vms": "virtualmachines",
+	"nd":  "networkdevices",
 }
 
 func canonicalKind(arg string) (string, bool) {
