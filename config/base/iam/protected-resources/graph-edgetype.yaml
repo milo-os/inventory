@@ -8,6 +8,12 @@ spec:
   kind: EdgeType
   plural: edgetypes
   singular: edgetype
+  subresources:
+    - name: status
+      permissions:
+        - get
+        - update
+        - patch
   permissions:
     - list
     - get

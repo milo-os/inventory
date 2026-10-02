@@ -35,6 +35,25 @@ generic `Node`, `Edge`, `NodeType`, and `EdgeType`. It gets the same treatment:
 Bindings for the graph group reference these role names and are likewise
 per-environment.
 
+## Resource status
+
+Customer viewer, editor, and admin Roles do not grant `/status` access. Their
+normal resource reads still include status. The inventory operator can patch
+status for its 12 inventory kinds; the graph operator can patch Node and Edge
+status, matching the controllers' condition updates. NodeType and EdgeType have no controller status writers today, so their status
+permissions are registered without an operator grant.
+
+These permissions require the ProtectedResource subresource schema and the
+provider's subresource authorization feature, which is off by default. Deploy
+the schema and provider support first. Enable the provider manager and wait for
+its authorization model to converge before applying the new operator Role
+permissions; then wait for Roles and bindings to reconcile before enabling
+webhook enforcement. While the manager feature is off, the new status grants
+are not valid permissions. These operator Roles are intended for internal
+controllers, are not inherited by customer Roles, and target platform-root
+resources. Actual PolicyBindings remain environment-owned; this package does
+not create or change them.
+
 ## Deployment
 
 Mirrors `config/base/crd`: this targets **Milo**, not the cluster the manager
