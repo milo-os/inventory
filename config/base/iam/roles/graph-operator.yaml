@@ -17,11 +17,13 @@ spec:
     - graph.inventory.miloapis.com/nodes.watch
     - graph.inventory.miloapis.com/nodes.update
     - graph.inventory.miloapis.com/nodes.patch
+    - graph.inventory.miloapis.com/nodes/status.patch
     - graph.inventory.miloapis.com/edges.get
     - graph.inventory.miloapis.com/edges.list
     - graph.inventory.miloapis.com/edges.watch
     - graph.inventory.miloapis.com/edges.update
     - graph.inventory.miloapis.com/edges.patch
+    - graph.inventory.miloapis.com/edges/status.patch
     - graph.inventory.miloapis.com/nodetypes.get
     - graph.inventory.miloapis.com/nodetypes.list
     - graph.inventory.miloapis.com/nodetypes.watch

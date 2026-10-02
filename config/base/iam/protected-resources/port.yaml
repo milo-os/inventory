@@ -8,6 +8,12 @@ spec:
   kind: Port
   plural: ports
   singular: port
+  subresources:
+    - name: status
+      permissions:
+        - get
+        - update
+        - patch
   permissions:
     - list
     - get
