@@ -22,26 +22,12 @@ below).
 - `policybindings.example.yaml` — a template binding a principal across the
   whole group. **Not** in `kustomization.yaml` — subjects are per-environment.
 
-### Graph group (`graph.inventory.miloapis.com`, v1alpha2)
-
-The v1alpha2 property-graph model adds a second API group whose kinds are the
-generic `Node`, `Edge`, `NodeType`, and `EdgeType`. It gets the same treatment:
-
-- `protected-resources/graph-{node,edge,nodetype,edgetype}.yaml`
-- `roles/graph-{viewer,editor,admin,operator}.yaml`
-  (`graph.inventory.miloapis.com-<role>`), same semantics as the
-  `inventory.miloapis.com-*` roles above.
-
-Bindings for the graph group reference these role names and are likewise
-per-environment.
-
 ## Resource status
 
 Customer viewer, editor, and admin Roles do not grant `/status` access. Their
 normal resource reads still include status. The inventory operator can patch
-status for its 12 inventory kinds; the graph operator can patch Node and Edge
-status, matching the controllers' condition updates. NodeType and EdgeType have no controller status writers today, so their status
-permissions are registered without an operator grant.
+status for its 12 inventory kinds, matching the controllers' condition
+updates.
 
 These permissions require the ProtectedResource subresource schema and the
 provider's subresource authorization feature, which is off by default. Deploy

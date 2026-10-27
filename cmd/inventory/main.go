@@ -20,11 +20,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	inventoryv1alpha1 "go.miloapis.com/inventory/api/v1alpha1"
-	inventoryv1alpha2 "go.miloapis.com/inventory/api/v1alpha2"
 	inventorycontroller "go.miloapis.com/inventory/internal/controller"
-	"go.miloapis.com/inventory/internal/graph"
 	webhookv1alpha1 "go.miloapis.com/inventory/internal/webhook/v1alpha1"
-	webhookv1alpha2 "go.miloapis.com/inventory/internal/webhook/v1alpha2"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -42,7 +39,6 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(inventoryv1alpha1.AddToScheme(scheme))
-	utilruntime.Must(inventoryv1alpha2.AddToScheme(scheme))
 
 	// +kubebuilder:scaffold:scheme
 }
@@ -99,11 +95,6 @@ func main() {
 
 	if err := inventorycontroller.SetupIndexers(ctx, mgr); err != nil {
 		setupLog.Error(err, "unable to set up field indexers")
-		os.Exit(1)
-	}
-
-	if err := graph.SetupIndexers(ctx, mgr); err != nil {
-		setupLog.Error(err, "unable to set up graph field indexers")
 		os.Exit(1)
 	}
 
@@ -213,21 +204,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := (&graph.NodeReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "GraphNode")
-		os.Exit(1)
-	}
-	if err := (&graph.EdgeReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "GraphEdge")
-		os.Exit(1)
-	}
-
 	if err := webhookv1alpha1.SetupRegionWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Region")
 		os.Exit(1)
@@ -274,15 +250,6 @@ func main() {
 	}
 	if err := webhookv1alpha1.SetupVirtualMachineWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "VirtualMachine")
-		os.Exit(1)
-	}
-
-	if err := webhookv1alpha2.SetupNodeWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "GraphNode")
-		os.Exit(1)
-	}
-	if err := webhookv1alpha2.SetupEdgeWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "GraphEdge")
 		os.Exit(1)
 	}
 

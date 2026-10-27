@@ -3783,7 +3783,7 @@ other platform resource) in another API group.
         <td><b>apiGroup</b></td>
         <td>string</td>
         <td>
-          APIGroup of the referenced resource (e.g. "resourcemanager.miloapis.com").<br/>
+          APIGroup of the referenced resource (e.g. "networking.miloapis.com").<br/>
         </td>
         <td>true</td>
       </tr><tr>
