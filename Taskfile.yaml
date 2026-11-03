@@ -6,9 +6,9 @@ vars:
   INVENTORY_IMAGE_TAG: "dev"
   TEST_INFRA_CLUSTER_NAME: "test-infra"
   TEST_INFRA_REPO_REF: 'v0.6.4'
-  CONTROLLER_TOOLS_VERSION: "v0.16.4"
+  CONTROLLER_TOOLS_VERSION: "v0.17.3"
   DEFAULTER_GEN_VERSION: "v0.32.3"
-  GOLANGCI_LINT_VERSION: "v2.1.5"
+  GOLANGCI_LINT_VERSION: "v2.15.0"
   # chainsaw is the e2e test runner only. Keep it on a release that compiles
   # with the repo's Go toolchain — pre-0.2.15 versions fail under Go 1.26
   # because their test runner predates testing.testDeps.ModulePath (see #36).
